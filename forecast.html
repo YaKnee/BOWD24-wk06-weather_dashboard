@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather App</title>
+    <link rel="stylesheet" href="./css/forecast.css">
+</head>
+<body>
+    <div class="container">
+        <div id="current-temp" >
+            <div id="main" class="shadow">
+                <div class="half">
+                    <p id="day"></p>
+                    <p id="date"></p>
+                    <p id="temp"></p>
+                </div>
+                <div class="half">
+                    <p id="feels-like"></p>
+                    <p id="temp-max"></p>
+                    <p id="temp-min"></p>
+                </div>  
+            </div>
+         
+            <div id="location-weather">
+
+                <div id="search-container">
+                    <p id="country"> </p>
+                    <input type="text" id="location-input" class="edit-input" value="Tampere">
+                    <button type="submit" id="submit-button"><i class="fa fa-location-arrow"></i></button>
+                </div>
+                <div class="not-found"><h1 class="not-found">City not found.</h1><p class="not-found">Try again with another city name.</p></div>
+
+                <div id="weather-image-container">
+                    <img src="./images/cloud.png" class="up-down abs" id="cloud" alt="" style="display: none;">
+                    <img src="./images/dcloud-1.png" class="dcloud slide abs"  alt="" style="display: none;">
+                    <img src="./images/dcloud-2.png" class="dcloud up-down abs" style="display: none;">
+                    <img src="./images/lightning.png" class="up-down abs" id="lightning" style="display: none;">
+                    <img src="./images/mist.png" class="mist slide abs" style="display: none;">
+                    <img src="./images/mist2.png" class="mist slide abs" style="display: none;">
+                    <img src="./images/Moon.png" class="abs" id="moon"  style="display: none;">
+                    <img src="./images/rain1.png" class="rain up-down abs" style="display: none;">
+                    <img src="./images/rain2.png" class="rain up-down abs" style="display: none;">
+                    <img src="./images/snow1.png" class="snow up-down abs" style="display: none;">
+                    <img src="./images/snow2.png" class="snow slide abs" style="display: none;">
+                    <img src="./images/sun.png" class="abs" id="sun" style="display: none;">
+                </div>
+
+                <p id="weather-desc"></p>
+            </div>
+            <div id="misc" class="shadow">
+                <div class="half">
+                    <p id="humidity"></p>
+                    <p id="pressure"></p>
+                    <p id="visibility"></p>
+                </div>
+                <div class="half">
+                    <p id="wind"></p>
+                    <p id="sunrise"></p>
+                    <p id="sunset"></p>
+                </div>
+
+            </div>
+        </div>
+
+        <div id="forecast" class="shadow"></div>
+    </div>
+
+    <script src="./js/forecast.js"></script>
+    <script src="https://kit.fontawesome.com/aa4d92cf3f.js" crossorigin="anonymous"></script>
+</body>
+</html>
