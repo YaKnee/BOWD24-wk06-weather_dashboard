@@ -1,25 +1,22 @@
 const getInputLocation = (dataType) => {
     try {
         const cityInput = document.querySelector(".city-holder");
-        const initialCity = cityInput.placeholder; 
+        let initialCity = sessionStorage.getItem("currentCity"); 
+        if (!initialCity) {
+            initialCity = cityInput.placeholder;
+        } else {
+            cityInput.placeholder = initialCity; 
+        }
         fetchGeoLocation(initialCity, dataType);
-
         const form = document.querySelector(".city-input form");
         form.addEventListener("submit", function(event) {
             event.preventDefault(); 
-            const cityInput = document.querySelector(".city-holder");
             const city = cityInput.value;
+            sessionStorage.setItem("currentCity", city); 
             cityInput.value = "";
             fetchGeoLocation(city, dataType);
         });
     } catch (error) {
-        // clearPage();
-        // const errorMessage = document.createElement("h1");
-        // errorMessage.innerHTML = "City not found. Please try again.";
-        
-        // const cityInput = document.querySelector(".city-input");
-        // cityInput.insertBefore(errorMessage, form);
-        
         console.log(error);
     }
 }
@@ -29,18 +26,10 @@ const fetchGeoLocation = async (city, dataType) => {
         const response = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${city}&count=1&language=en&format=json`);
         const data = await response.json();
         displayLocation(data, dataType);
-        console.log(data);
+        //console.log(data);
     } catch (error) {
         console.log(error);
     }
-}
-
-const clearPage = () => {
-    document.querySelector(".location-details").innerHTML = "";
-    document.querySelector(".data-table").innerHTML = "";
-    // document.getElementById("chart-temp").destroy();
-    // document.getElementById("chart-wind").destroy();
-    // document.getElementById("chart-humidity").destroy();
 }
 
 const displayLocation = (data, dataType) => {
@@ -86,7 +75,7 @@ const displayLocation = (data, dataType) => {
     const countryCode = document.createElement("img");
     countryCode.src = `https://flagcdn.com/${(data.results[0].country_code).toLowerCase()}.svg`;
     //countryCode.src = `https://flagsapi.com/${data.results[0].country_code}/flat/64.png`;
-    countryCode.style.width = "100px";
+    countryCode.style.width = "80px";
     countryCode.style.height = "50px";
     countryCode.alt = `${data.results[0].country} Flag`;
     countryCode.className = "col-2";
@@ -105,57 +94,75 @@ const fetchWeatherData = async(lat, long, timezone, dataType) => {
         const data = await response.json();
         console.log(data);
         if (dataType === 'temp') {
-            displayTempData(data);
+            displayData(data, "Temperature (°C)", "temperature_2m", "rgb(255,99,132)", "rgb(255,99,132,0.2)");
         }
         if (dataType === 'wind') {
-            displayWindData(data);
+            displayData(data, "Wind Speed (m/s)", "wind_speed_10m", "rgb(91,209,132)", "rgb(91,209,132,0.2)");
         }
         if (dataType === 'humidity') {
-            displayHumidityData(data);
+            displayData(data, "Humidity (%)", "relative_humidity_2m", "rgb(91,99,132)", "rgb(91,99,132,0.2)");
         } 
     } catch (error) {
         console.error(error);
     }
 }
-
-const displayTempData = (data) => {
-    const dataTemp = document.getElementById("data-temp");
-    const chartTemp = document.getElementById("chart-temp").getContext("2d");
-    
-    const tableTemp = createDataTable("Temperature &degC");
+const displayData = (data, title, reading, lineColor, bgColor) => {
+    const dataTable = document.querySelector(".data-table");
+    const table = createDataTable(title);
     for (let i = 0; i < data.hourly.time.length; i++) {
-        addDataRow(tableTemp, i, data.hourly.time, data.hourly.temperature_2m);
+        addDataRow(table, i, data.hourly.time, data.hourly[reading]);
     }
-    dataTemp.append(tableTemp);
-    createChart("chart-temp", "Temperature", data.hourly.temperature_2m, data.hourly.time, "rgb(255,99,132)", "rgb(255,99,132,0.2)");
+    dataTable.append(table);
+    createChart(title, data.hourly[reading], data.hourly.time, lineColor, bgColor);
+    fetchSevenDay(data.latitude, data.longitude, reading);
 }
 
-const displayWindData = (data) => {
-    const dataWind = document.getElementById("data-wind");
-    const tableWind = createDataTable("Wind Speed");
-    for (let i = 0; i < data.hourly.time.length; i++) {
-        addDataRow(tableWind, i,data.hourly.time, data.hourly.wind_speed_10m);
-    }
-    dataWind.append(tableWind);
-
-    createChart("chart-wind", "Wind Speed", data.hourly.wind_speed_10m, data.hourly.time, "rgb(91,209,132)", "rgb(91,209,132,0.2)");
-}
-const displayHumidityData = (data) => {
-    const dataHumidity = document.getElementById("data-humidity");
-    const tableHumidity = createDataTable("Relative Humidity");
-    for (let i = 0; i < data.hourly.time.length; i++) {
-        addDataRow(tableHumidity, i, data.hourly.time, data.hourly.relative_humidity_2m);
-    }
-    dataHumidity.append(tableHumidity);
-    createChart("chart-humidity", "Relative Humidity", data.hourly.relative_humidity_2m, data.hourly.time, "rgb(91,99,132)", "rgb(91,99,132,0.2)");
+const createDataTable = (headerText) => {
+    const tableElement = document.createElement("table");
+    tableElement.style.width = "100%";
+    tableElement.style.textAlign = "center";
+    const tableHead = document.createElement("tr");
+    const headers = ["#", "Date", "Time", headerText];
+    headers.forEach(header => {
+        const headerElement = document.createElement("th");
+        headerElement.innerText = header;
+        tableHead.append(headerElement);
+    });
+    tableElement.append(tableHead);
+    return tableElement;
 }
 
-const createChart = (canvasId, label, data, dateTimes, lineColor, fillColor) => {
-    console.log(dateTimes);
+const addDataRow = (table, index, time, dataSet) => {
+    const tableRow = document.createElement("tr");
+    const [dateComp, timeComp] = time[index].split("T");
+
+    const colOne = document.createElement("td");
+    colOne.innerText = index + 1;
+
+    const colTwo = document.createElement("td");
+    colTwo.innerText = rearrangeDate(dateComp);
+
+    const colThree = document.createElement("td");
+    colThree.innerText = timeComp;
+
+    const colFour = document.createElement("td");
+    colFour.innerText = dataSet[index];
+
+    tableRow.append(colOne);
+    tableRow.append(colTwo);
+    tableRow.append(colThree);
+    tableRow.append(colFour);
+
+    table.append(tableRow);
+}
+
+let myChart = null;
+const createChart = (label, data, dateTimes, lineColor, fillColor) => {
+    //console.log(dateTimes);
     const { dateArray, timeArray } = createDateAndTimeArrays(dateTimes);
-    const chartCtx = document.getElementById(canvasId).getContext("2d");
+    const chartCtx = document.querySelector(".my-charts").getContext("2d");
 
-    const myChart = new Chart(chartCtx, {
+    myChart = new Chart(chartCtx, {
         type: "line",
         data: {
             labels: timeArray,
@@ -188,61 +195,117 @@ const createChart = (canvasId, label, data, dateTimes, lineColor, fillColor) => 
     });
 };
 
+///////////////////////////////////////////////////////////////////////////////////////////////
+//-----------------------------------STATISTICS------------------------------------------------
+///////////////////////////////////////////////////////////////////////////////////////////////
+
+
+const fetchSevenDay = async(lat, long, dataType) => {
+    try {
+        const response = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${long}&hourly=${dataType}&wind_speed_unit=ms&timezone=auto&past_days=7&forecast_days=0` )
+        const data = await response.json();
+        createStatistics(data, dataType);
+    } catch (error) {
+        console.error(error);
+    }
+}
+
+let statChart = null;
+const createStatistics = (data, dataType) => {
+    const array = data.hourly[dataType];
+    const ctx = document.querySelector(".statistics").getContext('2d');
+    const statLabels = ['Mean', 'Median', 'Mode', 'Range', 'Standard Deviation', 'Max', 'Min'];
+    const statData = [mean(array), median(array), mode(array), range(array), std(array), max(array), min(array)];
+    const bgColor = [
+        'rgba(255, 99, 132, 0.2)',
+        'rgba(54, 162, 235, 0.2)',
+        'rgba(255, 206, 86, 0.2)',
+        'rgba(75, 192, 192, 0.2)',
+        'rgba(153, 102, 255, 0.2)',
+        'rgba(255, 159, 64, 0.2)',
+        'rgba(0, 128, 0, 0.2)' 
+      ];
+    const lineColor = [
+        'rgb(255, 99, 132)',
+        'rgb(54, 162, 235)',
+        'rgb(255, 206, 86)',
+        'rgb(75, 192, 192)',
+        'rgb(153, 102, 255)',
+        'rgb(255, 159, 64)',
+        'rgb(0, 128, 0)'
+      ];
+    statChart = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: statLabels,
+        datasets: [{
+          label: 'Statistics',
+          data: statData,
+          backgroundColor: bgColor,
+          borderColor: lineColor,
+          borderWidth: 1,
+          borderRadius: 5,
+        }]
+      },
+      options: {
+        scales: {
+            y: {
+                beginAtZero: false,
+            },
+            x: {
+                beginAtZero: false
+            }
+        },
+        plugins: {
+            legend: {
+                display:false,
+                position: "bottom",
+            },
+            title: {
+                display: true,
+                text: "Statistics of Last 7 Days (Exclusive):"
+            },
+        }
+      }
+    });
+    createStatTable(statLabels, statData, lineColor);
+}
+
+const createStatTable = (statLabels, statData, bgColor) => {
+    // const statTable = document.getElementById(tableId);
+    const statTable = document.querySelector(".stat-table");
+    statTable.innerHTML = "";
+    const labelRow = document.createElement('tr');
+    const dataRow = document.createElement('tr');
+    
+    for (let i = 0; i < statLabels.length; i++) {
+        const labelCell = document.createElement('th');
+        labelCell.innerText = statLabels[i]; 
+        labelCell.style.backgroundColor = bgColor[i];
+        const dataCell = document.createElement('td');
+        dataCell.innerText = statData[i]; 
+        labelRow.append(labelCell);
+        dataRow.append(dataCell);
+    }
+    
+    statTable.append(labelRow);
+    statTable.append(dataRow);
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////
+//-----------------------------------MISC------------------------------------------------------
+///////////////////////////////////////////////////////////////////////////////////////////////
+
 const createDateAndTimeArrays = (timestamps) => {
     const dateArray = [];
     const timeArray = [];
-    
     timestamps.forEach(dateTime => {
         const [date, time] = dateTime.split('T');
         dateArray.push(date);
         timeArray.push(time);
     });
-
     return { dateArray, timeArray };
 };
-
-const createDataTable = (headerText) => {
-    const tableElement = document.createElement("table");
-    tableElement.style.width = "100%";
-    tableElement.style.textAlign = "center";
-
-    const tableHead = document.createElement("tr");
-    const headers = ["#", "Date", "Time", headerText];
-    headers.forEach(header => {
-        const headerElement = document.createElement("th");
-        headerElement.innerHTML = `<strong>${header}</strong>`;
-        tableHead.append(headerElement);
-    });
-    tableElement.append(tableHead);
-
-    return tableElement;
-}
-
-
-const addDataRow = (table, index, time, dataSet) => {
-    const tableRow = document.createElement("tr");
-    const [dateComp, timeComp] = time[index].split("T");
-
-    const colOne = document.createElement("td");
-    colOne.innerText = index + 1;
-
-    const colTwo = document.createElement("td");
-    colTwo.innerText = rearrangeDate(dateComp);
-
-    const colThree = document.createElement("td");
-    colThree.innerText = timeComp;
-
-    const colFour = document.createElement("td");
-    colFour.innerText = dataSet[index];
-
-    tableRow.append(colOne);
-    tableRow.append(colTwo);
-    tableRow.append(colThree);
-    tableRow.append(colFour);
-
-    table.append(tableRow);
-}
-
 
 const rearrangeDate = (dateString) => {
     let [year, month, day] = dateString.split("-");
@@ -259,4 +322,16 @@ const rearrangeDate = (dateString) => {
         suffix = "th";
     }
     return `${day}${suffix} ${month} ${year}`;
+}
+
+
+const clearPage = () => {
+    document.querySelector(".location-details").innerHTML = "";
+    document.querySelector(".data-table").innerHTML = "";
+    if (statChart!== null) {
+        statChart.destroy();
+    }
+    if (myChart !== null) {
+        myChart.destroy();
+    }
 }

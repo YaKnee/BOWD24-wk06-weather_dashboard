@@ -19,7 +19,7 @@
   <nav class="navbar navbar-expand-lg bg-body-tertiary bg-dark border-bottom border-body sticky-top" data-bs-theme="dark">
 
     <div class="container-fluid">
-      <a class="navbar-brand" href="./index.html">
+        <a class="navbar-brand" href="./index.html">
             <img src="./images/logo.png" alt="Logo" width="30" height="24" class="d-inline-block align-text-top">
             Weather
         </a>
@@ -34,16 +34,16 @@
             </li>
 
             <li class="nav-item">
-              <a class="nav-link" href="./history.html">History</a>
+              <a class="nav-link active" href="./history.html">History</a>
             </li>
-
+            
             <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle active" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                <a class="nav-link dropdown-toggle " href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                   Today
                 </a>
                 <ul class="dropdown-menu">
                   <li><a class="dropdown-item" href="./temperature.html">Temperature</a></li>
-                  <li><a class="dropdown-item active"  aria-current="page" href="./humidity.html">Humidity</a></li>
+                  <li><a class="dropdown-item" href="./humidity.html">Humidity</a></li>
                   <li><a class="dropdown-item" href="./wind.html">Wind Speed</a></li>
                 </ul>
             </li>
@@ -62,7 +62,7 @@
       <article>
 
         <section class="row location-details"></section>
-        
+
         <section class="city-input">
           <form >
             <div class="form-floating mb-3">
@@ -73,31 +73,23 @@
         </section>
 
         <section class="row mt-5">
-
           <div class="col-lg-6">
-            <div class="data-table pt-0 mb-2"></div>
+            <div class="data-table pt-0" id="data-temp"></div>
           </div>
-
           <div class="col-lg-6">
-            <div class="border border-secondary mb-2 rounded">
-              <canvas class="my-charts"><p>Your browser does not support the canvas element.</p></canvas>
-            </div>
-
-
-            <div class="border border-secondary mt-2 rounded">
-              <canvas class="statistics"><p>Your browser does not support the canvas element.</p></canvas>
-              <table class="stat-table text-center"></table>
-            </div>
-
+            <canvas class="my-charts" id="chart-temp" style="width: 100%"><p>Your browser does not support the canvas element.</p></canvas>
           </div>
         </section>
 
       </article>
-      
+
+
       <div class="d-flex justify-content-evenly">
         <a href="https://flagpedia.net/" target="_blank">Flag API</a>
         <a href="https://open-meteo.com/en/docs/" target="_blank">Weather API</a>
         <a href="https://www.chartjs.org/" target="_blank">Chart.js</a>
+      </div>
+
       </div>
 
 
@@ -107,8 +99,7 @@
     crossorigin="anonymous"
     ></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="./js/statistics.js"></script>
     <script src="./js/script.js"></script>
-    <script defer>getInputLocation("humidity")</script>
+    <script defer>getInputLocation("temp")</script>
 </body>
 </html>

@@ -1,13 +1,13 @@
-section {
-    padding-top: 60px;
-}
-/* #location-details{
-    display: flex;
-    justify-content: space-evenly;
-} */
-
-tr:nth-child(odd){ 
+table tr:nth-child(odd){
     background-color: white;
     border-top: 1px solid rgba(0, 0, 0, 0.5);
     border-bottom: 1px solid rgba(0, 0, 0, 0.5);
+}
+
+table {
+    width: 100%;
+}
+
+.location-details{
+    padding-top: 30px;
 }
