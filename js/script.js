@@ -1,38 +1,50 @@
+
 const getInputLocation = (dataType) => {
     try {
         const cityInput = document.querySelector(".city-holder");
-        let initialCity = sessionStorage.getItem("currentCity"); 
-        if (!initialCity) {
-            initialCity = cityInput.placeholder;
-        } else {
-            cityInput.placeholder = initialCity; 
-        }
-        fetchGeoLocation(initialCity, dataType);
-        const form = document.querySelector(".city-input form");
+        const selectElement = document.getElementById("length-select");
+        let lengthInput = selectElement.value;
+        const fetchAndUpdate = (lengthInput) => {
+            let initialCity = sessionStorage.getItem("currentCity"); 
+            if (!initialCity) {
+                initialCity = cityInput.placeholder;
+            } else {
+                cityInput.placeholder = initialCity; 
+            }
+            fetchGeoLocation(initialCity, dataType, lengthInput);
+        };
+
+        selectElement.addEventListener('change', function(event) {
+            lengthInput = event.target.value;
+            fetchAndUpdate(lengthInput);
+        });
+
+        const form = document.querySelector(".city-input");
         form.addEventListener("submit", function(event) {
             event.preventDefault(); 
             const city = cityInput.value;
             sessionStorage.setItem("currentCity", city); 
             cityInput.value = "";
-            fetchGeoLocation(city, dataType);
+            fetchAndUpdate(lengthInput);
         });
+        fetchAndUpdate(selectElement.value);
     } catch (error) {
         console.log(error);
     }
 }
 
-const fetchGeoLocation = async (city, dataType) => {
+const fetchGeoLocation = async (city, dataType, lengthInput) => {
     try {
         const response = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${city}&count=1&language=en&format=json`);
         const data = await response.json();
-        displayLocation(data, dataType);
+        displayLocation(data, dataType, lengthInput);
         //console.log(data);
     } catch (error) {
         console.log(error);
     }
 }
 
-const displayLocation = (data, dataType) => {
+const displayLocation = (data, dataType, lengthInput) => {
     clearPage();
     const location = document.querySelector(".location-details");
     location.style.width = "100%";
@@ -84,13 +96,13 @@ const displayLocation = (data, dataType) => {
 
     location.append(halfOne);
     location.append(halfTwo);
-    fetchWeatherData(lat, long, encodeURIComponent(timezone), dataType);
+    fetchWeatherData(lat, long, encodeURIComponent(timezone), dataType, lengthInput);
 }
 
 
-const fetchWeatherData = async(lat, long, timezone, dataType) => {
+const fetchWeatherData = async(lat, long, timezone, dataType, lengthInput) => {
     try {
-        const response = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${long}&hourly=temperature_2m,relative_humidity_2m,wind_speed_10m&wind_speed_unit=ms&timezone=${timezone}&forecast_days=1`)
+        const response = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${long}&hourly=temperature_2m,relative_humidity_2m,wind_speed_10m&wind_speed_unit=ms&timezone=${timezone}&forecast_days=1&past_days=${lengthInput}`)
         const data = await response.json();
         console.log(data);
         if (dataType === 'temp') {
@@ -183,14 +195,20 @@ const createChart = (label, data, dateTimes, lineColor, fillColor) => {
             },
             plugins: {
                 legend: {
-                    display: true,
+                    display: false,
                     position: "bottom",
                 },
                 title: {
                     display: true,
-                    text: rearrangeDate(dateArray[0]),
+                    text: label,
                 },
+            },
+            interaction: {
+                intersect: false,
+                mode: 'nearest',
+                axis: "x",
             }
+
         }
     });
 };
@@ -202,8 +220,9 @@ const createChart = (label, data, dateTimes, lineColor, fillColor) => {
 
 const fetchSevenDay = async(lat, long, dataType) => {
     try {
-        const response = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${long}&hourly=${dataType}&wind_speed_unit=ms&timezone=auto&past_days=7&forecast_days=0` )
+        const response = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${long}&hourly=${dataType}&wind_speed_unit=ms&timezone=auto&past_days=6&forecast_days=1` )
         const data = await response.json();
+        // console.log(data);
         createStatistics(data, dataType);
     } catch (error) {
         console.error(error);
@@ -250,7 +269,7 @@ const createStatistics = (data, dataType) => {
       options: {
         scales: {
             y: {
-                beginAtZero: false,
+                beginAtZero: true,
             },
             x: {
                 beginAtZero: false
@@ -263,7 +282,7 @@ const createStatistics = (data, dataType) => {
             },
             title: {
                 display: true,
-                text: "Statistics of Last 7 Days (Exclusive):"
+                text: "Statistics of Last 7 Days (Inclusive):"
             },
         }
       }

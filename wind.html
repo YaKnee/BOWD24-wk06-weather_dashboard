@@ -49,7 +49,7 @@
             </li>
 
             <li class="nav-item">
-                <a class="nav-link" href="./forecast.html">Forecast</a>
+                <a class="nav-link" href="./forecast.html">Forecast App</a>
             </li>
         </ul>
       </div>
@@ -63,20 +63,30 @@
 
         <section class="row location-details"></section>
 
-        <section class="city-input">
-          <form >
-            <div class="form-floating mb-3">
-              <input type="text" class="form-control city-holder" id="floatingInput" placeholder="Tampere">
-              <label for="floatingInput">City Name</label>
-            </div>
-          </form>
+        <section class="row">
+
+          <div class="col input-fields">
+            <form class="city-input">
+              <div class="form-floating mb-3">
+                <input type="text" class="form-control city-holder" id="floatingInput" placeholder="Tampere">
+                <label for="floatingInput">City Name</label>
+              </div>
+            </form>
+          </div>
+
+          <div class="col input-fields">
+            <select class="form-select" aria-label="Default select example" id="length-select">
+              <option value="0" selected>Today</option>
+              <option value="1">Past 2 days</option>
+              <option value="2">Past 3 days</option>
+              <option value="6">Past Week</option>
+              <option value="30">Past Month</option>
+            </select>
+          </div>
+
         </section>
 
         <section class="row mt-5">
-
-          <div class="col-lg-6">
-            <div class="data-table pt-0 mb-2"></div>
-          </div>
 
           <div class="col-lg-6">
             <div class="border border-secondary mb-2 rounded">
@@ -84,11 +94,16 @@
             </div>
 
 
-            <div class="border border-secondary mt-2 rounded">
+            <div class="border border-secondary my-2 rounded">
               <canvas class="statistics"><p>Your browser does not support the canvas element.</p></canvas>
               <table class="stat-table text-center"></table>
             </div>
 
+          </div>
+
+          
+          <div class="col-lg-6">
+            <div class="data-table pt-0 mb-2"></div>
           </div>
         </section>
 

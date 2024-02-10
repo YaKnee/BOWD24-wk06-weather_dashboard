@@ -49,7 +49,7 @@
             </li>
 
             <li class="nav-item">
-                <a class="nav-link" href="./forecast.html">Forecast</a>
+                <a class="nav-link" href="./forecast.html">Forecast App</a>
             </li>
         </ul>
       </div>
@@ -63,13 +63,46 @@
 
         <section class="row location-details"></section>
 
-        <section class="city-input">
-          <form >
-            <div class="form-floating mb-3">
-              <input type="text" class="form-control city-holder" id="floatingInput" placeholder="Tampere">
-              <label for="floatingInput">City Name</label>
+
+        <section class="row row-cols-2">
+
+          <div class="col-md-6 input-fields">
+            <form class="city-input">
+              <div class="form-floating mb-3">
+                <input type="text" class="form-control city-holder" id="floatingInput" placeholder="Tampere">
+                <label for="floatingInput">City Name</label>
+              </div>
+            </form>
+          </div>
+
+          <div class="col-md-6 input-fields">
+            <select class="form-select" aria-label="Default select example" id="data-type">
+              <option value="temperature_2m_mean" selected>Temperature</option>
+              <option value="wind_speed_10m_max">Wind Speed</option>
+              <option value="sunrise">Sunrise</option>
+              <option value="sunset">Sunset</option>
+              <option value="30">Other</option>
+            </select>
+          </div>
+
+
+          <div class="col-12">
+            <div class="d-flex flex-row justify-content-center mt-1">
+              <div class="mx-1">
+                <label class="text-center" for="start">Start:</label>
+                <input class="" type="date" id="start" value="" min="1940-01-01" max="" />
+              </div>
+
+              <div class="mx-1">
+                <label class="text-center" for="end">End:</label>
+                <input class="" type="date" id="end" value="" min="1940-01-01" max="" />
+              </div>
+
+              <div class="mx-1 align-self-end">
+                <input type="submit" value="Submit" id="submit"></input>
+              </div>
             </div>
-          </form>
+          </div>
         </section>
 
         <section class="row mt-5">
@@ -99,7 +132,7 @@
     crossorigin="anonymous"
     ></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="./js/script.js"></script>
+    <script src="./js/history.js"></script>
     <script defer>getInputLocation("temp")</script>
 </body>
 </html>

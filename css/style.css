@@ -11,3 +11,7 @@ table {
 .location-details{
     padding-top: 30px;
 }
+
+.input-fields *{
+    height: 60px !important;
+}
