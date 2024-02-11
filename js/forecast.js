@@ -53,7 +53,11 @@ const createCurrentMainItem = (temp, feels_like, temp_max, temp_min, timezone) =
 };
 
 const createCurrentLocationItem = (weather,icon,country) => { 
-  document.getElementById("country").innerText = country + ":  ";
+  const countryImage =  document.getElementById("country");
+  countryImage.src = `https://flagcdn.com/${(country).toLowerCase()}.svg`;
+  countryImage.style.width = "30px";
+  countryImage.style.height = "15px";
+  countryImage.alt = `${country} Flag`;
   const sun = document.getElementById("sun");
   const cloud = document.getElementById("cloud");
   const dcloud = document.querySelectorAll(".dcloud");
@@ -410,6 +414,12 @@ const updateLocation = () => {
   fetchWeatherForecast();
 };
 const submitButton = document.getElementById("submit-button");
-
+// const submitText = document.getElementById("location-input");
 submitButton.onpointerdown = updateLocation;
+// submitText.addEventListener("keypress", handleKeyPress);
 
+// const handleKeyPress = (event) => {
+//   if (event.key === "Enter") {
+//     updateLocation();
+//   }
+// };

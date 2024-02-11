@@ -171,9 +171,12 @@ const addDataRow = (table, index, time, dataSet) => {
 let myChart = null;
 const createChart = (label, data, dateTimes, lineColor, fillColor) => {
     //console.log(dateTimes);
-    const { dateArray, timeArray } = createDateAndTimeArrays(dateTimes);
+    let { dateArray, timeArray } = createDateAndTimeArrays(dateTimes);
+    const times = dateTimes.map(time => time.replace("T", " "));
     const chartCtx = document.querySelector(".my-charts").getContext("2d");
-
+    if(times.length > 100) {
+        timeArray = dateArray;
+    }
     myChart = new Chart(chartCtx, {
         type: "line",
         data: {
@@ -190,7 +193,7 @@ const createChart = (label, data, dateTimes, lineColor, fillColor) => {
         options: {
             scales: {
                 y: {
-                    beginAtZero: false,
+                    beginAtZero: true,
                 }
             },
             plugins: {
@@ -258,7 +261,7 @@ const createStatistics = (data, dataType) => {
       data: {
         labels: statLabels,
         datasets: [{
-          label: 'Statistics',
+          //label: 'Statistics',
           data: statData,
           backgroundColor: bgColor,
           borderColor: lineColor,
