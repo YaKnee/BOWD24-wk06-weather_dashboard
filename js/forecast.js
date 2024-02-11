@@ -31,7 +31,7 @@ const oneDecimal = (degree) => {
 
 let rightNow = Math.round( new Date().getTime() / 1000);
 const timezoneOffset = new Date().getTimezoneOffset() * 60;
-console.log(new Date().getTimezoneOffset() * 60);
+//console.log(new Date().getTimezoneOffset() * 60);
 
 const createCurrentMainItem = (temp, feels_like, temp_max, temp_min, timezone) => { 
   let currentDate = new Date((rightNow + timezone + timezoneOffset)*1000);
@@ -47,9 +47,9 @@ const createCurrentMainItem = (temp, feels_like, temp_max, temp_min, timezone) =
   document.getElementById("day").innerText = daysOfWeek[currentDate.getDay()];
   document.getElementById("date").innerText = formatDate;
   document.getElementById("temp").innerText = oneDecimal(temp) + "°C";
-  document.getElementById("feels-like").innerHTML = '<i class="fa fa-person-circle-question"></i> ' + oneDecimal(feels_like) + '°C';
-  document.getElementById("temp-max").innerHTML = '<i class="fa fa-temperature-arrow-up"></i> ' + oneDecimal(temp_max) + "°C";
-  document.getElementById("temp-min").innerHTML = '<i class="fa fa-temperature-arrow-down"></i> ' + oneDecimal(temp_min) + "°C";
+  document.getElementById("feels-like").innerHTML = '<i class="bi bi-person-fill-exclamation"></i> ' + oneDecimal(feels_like) + '°C';
+  document.getElementById("temp-max").innerHTML = '<i class="bi bi-thermometer-high"></i> ' + oneDecimal(temp_max) + "°C";
+  document.getElementById("temp-min").innerHTML = '<i class="bi bi-thermometer"></i> ' + oneDecimal(temp_min) + "°C";
 };
 
 const createCurrentLocationItem = (weather,icon,country) => { 
@@ -77,25 +77,18 @@ const createCurrentLocationItem = (weather,icon,country) => {
       break;
     case "02d":
       sun.style.display = "block";
-      cloud.style.top = "25%";
+      cloud.style.marginTop = "120px";
       cloud.style.display = "block"
       break;
     case "02n":
       moon.style.display = "block";
-      moon.style.top = "10%";
       cloud.style.display = "block"
-      cloud.style.top = "30%"
+      cloud.style.marginTop = "120px";
       dcloud[1].style.display = "block";
-      dcloud[1].style.top = "20%";
+      dcloud[1].style.marginTop = "80px";
       break;
     case "02d":
       sun.style.display = "block";
-      cloud.style.display = "block"
-      break;
-    case "03d":
-      cloud.style.display = "block"
-      break;
-    case "03n":
       cloud.style.display = "block"
       break;
     case "04d":
@@ -107,11 +100,6 @@ const createCurrentLocationItem = (weather,icon,country) => {
       cloud.style.display = "block"
       break;
     case "09d":
-      cloud.style.display = "block"
-      cloud.style.zIndex = "1"
-      displayBlock(dcloud)
-      displayBlock(rain);
-      break;
     case "09n":
       displayBlock(dcloud);
       cloud.style.display = "block"
@@ -122,27 +110,20 @@ const createCurrentLocationItem = (weather,icon,country) => {
       sun.style.display = "block"
       sun.style.margin = "0 0 15% 25%"
       cloud.style.display = "block"
-      cloud.style.margin = "5% 0 0 0"
+      cloud.style.marginTop = "5%"
       displayBlock(rain);
       break;
     case "10n":
       moon.style.display = "block"
-      moon.style.margin = "0 0 5% 15%"
+      moon.style.margin = "0 0 80px 100px";
       cloud.style.display = "block"
-      cloud.style.top = "15%"
+      cloud.style.marginTop = "40px";
       dcloud[0].style.display = "block"
-      dcloud[0].style.top = "20%";
+      dcloud[0].style.marginTop = "50px";
       dcloud[0].style.zIndex = "3"
       displayBlock(rain);
       break;
     case "11d":
-      dcloud.forEach((img) => {
-        img.style.display = "block";
-        img.style.zIndex = "3"
-      });
-      cloud.style.display = "block"
-      lightning.style.display = "block"
-      break;
     case "11n":
       dcloud.forEach((img) => {
         img.style.display = "block";
@@ -154,9 +135,8 @@ const createCurrentLocationItem = (weather,icon,country) => {
     case "13n":
       displayBlock(dcloud);
       moon.style.display = "block"
-      moon.style.margin = "0 0 15% 25%"
+      moon.style.margin = "0 0 80px 100px";
       cloud.style.display = "block"
-      cloud.style.margin = "5% 0 0 0"
       displayBlock(snow);
       break;
     case "13d":
@@ -167,10 +147,14 @@ const createCurrentLocationItem = (weather,icon,country) => {
     case "50d":
       sun.style.display = "block"
       displayBlock(mist);
+      mist[0].style.zIndex = "3";
+      mist[1].style.zIndex = "3";
       break;
     case "50n":
       moon.style.display = "block"
       displayBlock(mist);
+      mist[0].style.zIndex = "3";
+      mist[1].style.zIndex = "3";
       break;
     default:
       cloud.style.display = "block"
@@ -234,7 +218,7 @@ const fetchCurrentWeather = async () => {
   try {
     const response = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${CITY}&appid=${API_KEY}&units=metric`);
     const data = await response.json();
-    console.log(data);
+    //console.log(data);
     displayNone(errorMessage);
     populateCurrentWeatherDetails(data);
     setTimeout(fetchCurrentWeather, 1000 * 60 * 60 * 3); //calls every 3hrs
@@ -317,12 +301,12 @@ const createDailyWeather = (weatherObject) => {
 
   const highTemp = document.createElement("p");
   highTemp.className = "high-temp";
-  highTemp.innerHTML = '<i class="fa fa-temperature-arrow-up" style="margin-right: 5px;"></i><strong>' + oneDecimal(weatherObject.highTemp) + "°C</strong>";
+  highTemp.innerHTML = '<i class="bi bi-thermometer-high" style="margin-right: 5px;"></i><strong>' + oneDecimal(weatherObject.highTemp) + "°C</strong>";
   highLow.append(highTemp);
 
   const lowTemp = document.createElement("p");
   lowTemp.className = "low-temp";
-  lowTemp.innerHTML = '<i class="fa fa-temperature-arrow-down" style="margin-right: 5px;"></i><strong>' + oneDecimal(weatherObject.lowTemp) + "°C</strong>";
+  lowTemp.innerHTML = '<i class="bi bi-thermometer" style="margin-right: 5px;"></i><strong>' + oneDecimal(weatherObject.lowTemp) + "°C</strong>";
   highLow.append(lowTemp);
 
   weatherForecast.append(highLow);
@@ -379,7 +363,7 @@ const groupWeatherByDate = (data) => {
     daysArray.shift()
 
   }
-  console.log(daysArray);
+  //console.log(daysArray);
 
   daysArray.forEach((dayArray) => getDailyWeatherElements(dayArray));
 };
@@ -388,8 +372,9 @@ const fetchWeatherForecast = async () => {
   try {
     const response = await fetch(`https://api.openweathermap.org/data/2.5/forecast?q=${CITY}&appid=${API_KEY}&units=metric`);
     const data = await response.json();
-    // console.log(data);
+    //console.log(data);
     groupWeatherByDate(data);
+    createChart(data);
     setTimeout(fetchWeatherForecast, 1000 * 60 * 60 * 3);
   } catch (error) {
     console.error(error);
@@ -397,6 +382,62 @@ const fetchWeatherForecast = async () => {
 };
 fetchWeatherForecast();
 
+let myChart = null;
+const createChart = (data) => {
+  console.log(data.list);
+  const times = data.list.map(time => time.dt_txt);
+  const temps = data.list.map(temp => temp.main.temp);
+  console.log(temps);
+  console.log(times);
+  const chartCtx = document.getElementById("forecast-chart").getContext("2d");
+  if (myChart !== null) {
+    myChart.destroy();
+  }
+  myChart = new Chart(chartCtx, {
+    type: "line",
+    data: {
+        labels: times,
+        datasets: [{
+            label: "°C",
+            data: temps,
+            //backgroundColor: "red",
+            borderColor: "rgb(255,196,0)",
+            borderWidth: 1,
+            fill: "origin",
+        }]
+    },
+    options: {
+        scales: {
+            y: {
+                beginAtZero: true,
+            },
+            x: {
+              ticks: {
+                  display: false,
+              }
+          }
+        },
+        plugins: {
+            legend: {
+                display: false,
+                position: "bottom",
+            },
+            title: {
+                display: true,
+                text: "Temperature (°C)",
+                color: "white"
+            },
+        },
+        interaction: {
+            intersect: false,
+            mode: 'nearest',
+            axis: "x",
+        }
+
+    }
+});
+
+};
 const resetPage = () => {
   console.log("Resetting");
   const paragraphs = document.getElementById("current-temp").querySelectorAll('p:not(.not-found)');
@@ -404,7 +445,7 @@ const resetPage = () => {
     paragraph.innerHTML = "";
   });
   document.getElementById("forecast").innerHTML = "";
-
+  myChart.destroy();
 }
 const updateLocation = () => {
   const locationInput = document.getElementById("location-input");

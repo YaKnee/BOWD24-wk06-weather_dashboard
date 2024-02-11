@@ -60,28 +60,31 @@
 
         <div id="current-temp" class="row text-white mt-2 mx-auto" >
 
-            <div id="main" class="shadow col-md-3 rounded d-flex justify-content-center">
-                <div class="align-self-center" >
-                    <div class="half">
-                        <p class="" id="day"></p>
-                        <p class="" id="date"></p>
-                        <p class="" id="temp"></p>
+            <div id="main" class="shadow col-md-3 rounded-4 mt-2 d-flex justify-content-around">
+
+                <div class="d-flex align-items-center" >
+                    <div class="container">
+                        <div class="row row-cols-3 ">
+                            <p class="col-md-12" id="day"></p>
+                            <p class="col-md-12" id="date"></p>
+                            <p class="col-md-12" id="temp"></p>
+                        </div>
+                        <div class="row row-cols-3">
+                            <p class="col-md-12" id="feels-like"></p>
+                            <p class="col-md-12" id="temp-max"></p>
+                            <p class="col-md-12" id="temp-min"></p>
+                            </div>
+                        </div> 
                     </div>
-                    <div class="half">
-                        <p class="" id="feels-like"></p>
-                        <p class="" id="temp-max"></p>
-                        <p class="" id="temp-min"></p>
-                    </div> 
                 </div>
  
-            </div>
          
-            <div id="location-weather" class=" col-md-6 row m-0 rounded position-relative">
+            <div id="location-weather" class=" col-md-6 row m-0 rounded-4 mt-2 position-relative">
                 
                 <div id="search-container" class="d-flex justify-content-center my-2">
-                    <img id="country"></img>
-                    <input type="text" id="location-input" class="edit-input" value="Tampere">
-                    <button type="submit" id="submit-button"><i class="bi bi-geo-alt-fill"></i></button>
+                    <img id="country" class="mt-2 me-2"></img>
+                    <input type="text" id="location-input" class="edit-input form-control" value="Tampere">
+                    <button type="submit" id="submit-button" class="ms-1 btn btn-primary"><i class="bi bi-geo-alt-fill"></i></button>
                 </div>
                 <div class="not-found"><h1 class="not-found">City not found.</h1><p class="not-found">Try again with another city name.</p></div>
 
@@ -103,25 +106,29 @@
                 <p id="weather-desc" class="align-self-end text-capitalize"></p>
             </div>
 
-            <div id="misc" class="shadow col-md-3 rounded  d-flex justify-content-center">
+            <div id="misc" class="shadow col-md-3 rounded-4 mt-2  d-flex justify-content-center">
                 <div class="align-self-center">
-
-                    <div class="half">
-                        <p id="humidity"></p>
-                        <p id="pressure"></p>
-                        <p id="visibility"></p>
+                    <div class="container">
+                        <div class="row row-cols-3">
+                            <p class="col-md-12" id="humidity"></p>
+                            <p class="col-md-12" id="pressure"></p>
+                            <p class="col-md-12" id="visibility"></p>
+                        </div>
+                        <div class="row row-cols-3">
+                            <p class="col-md-12" id="wind"></p>
+                            <p class="col-md-12" id="sunrise"></p>
+                            <p class="col-md-12" id="sunset"></p>
+                        </div>   
                     </div>
-                    <div class="half">
-                        <p id="wind"></p>
-                        <p id="sunrise"></p>
-                        <p id="sunset"></p>
-                    </div>
-    
+ 
                 </div>
             </div>
         </div>
 
-        <div id="forecast" class="shadow"></div>
+        <div id="forecast" class="shadow d-flex justify-content-evenly rounded-4 my-2"></div>
+        <div class="shadow rounded-4 my-2">
+            <canvas id="forecast-chart" ></canvas>
+        </div>
     </div>
 
     <script
@@ -131,6 +138,5 @@
     ></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="./js/forecast.js"></script>
-    <script src="https://kit.fontawesome.com/aa4d92cf3f.js" crossorigin="anonymous"></script>
 </body>
 </html>
