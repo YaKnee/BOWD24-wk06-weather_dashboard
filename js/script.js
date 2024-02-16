@@ -96,6 +96,8 @@ const displayLocation = (data, dataType, lengthInput) => {
 
     location.append(halfOne);
     location.append(halfTwo);
+    sessionStorage.setItem("latitude", lat);
+    sessionStorage.setItem("longitude", long);
     fetchWeatherData(lat, long, encodeURIComponent(timezone), dataType, lengthInput);
 }
 

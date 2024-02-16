@@ -130,6 +130,10 @@ const fetchWeatherData = async(lat, long, timezone, dataType, startInput, endInp
         const response = await fetch(`https://archive-api.open-meteo.com/v1/archive?latitude=${lat}&longitude=${long}&start_date=${startInput}&end_date=${endInput}&hourly=${dataType}&wind_speed_unit=ms&timezone=${timezone}`)
         const data = await response.json();
         console.log(data);
+        // /////////////////////////////////////////////////////////////////////////////////////////
+        // if (dataType === "wind_direction_10m") {
+        //     //CONVERT DEGREES TO DIRECTION
+        // }
         displayData(data, dataType, data.hourly[dataType]);
         createChart(data, dataType);
     } catch (error) {
@@ -242,7 +246,7 @@ const createChart = (data, dataType) => {
             data: {
                 labels: times,
                 datasets: [{
-                    label: dataType,
+                    //label: dataType,
                     data: readings,
                     backgroundColor: "rgba(255, 99, 132, 0.2)",
                     borderColor: "rgb(255, 99, 132)",
@@ -263,7 +267,7 @@ const createChart = (data, dataType) => {
                     },
                     title: {
                         display: true,
-                        text: "Stuff",
+                        text: dataType,
                     },
                 },
                 interaction: {
