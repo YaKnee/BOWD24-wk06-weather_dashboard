@@ -1,5 +1,3 @@
-const API_KEY = "ef10c05609e96f73b1438826cd13b827";
-const searchCity = document.getElementById("location");
 let CITY = "Tampere";
 const daysOfWeek = ["Sunday", "Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
 const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
@@ -23,7 +21,7 @@ const getInputLocation = () => {
   try {
     const cityInput = document.getElementById("location-input");
     const fetchAndUpdate = () => {
-      let initialCity = sessionStorage.getItem("current-city");
+      let initialCity = sessionStorage.getItem("currentCity");
       if (!initialCity) {
         initialCity = cityInput.value;
       } else {
@@ -36,7 +34,7 @@ const getInputLocation = () => {
     citySubmit.addEventListener("pointerdown", function (event) {
       event.preventDefault();
       const city = cityInput.value;
-      sessionStorage.setItem("current-city", city);
+      sessionStorage.setItem("currentCity", city);
       cityInput.value = "";
       resetPage();
       fetchAndUpdate();
@@ -82,7 +80,7 @@ const fetchWeatherData = async (countryCode) => {
     groupWeatherByDate(data, isDay);
     createChart(data);
 
-    setTimeout(fetchWeatherData, 1000 * 60 * 60 * 3); //calls every 3hrs
+    setTimeout(fetchWeatherData, 1000 * 60 * 60); //calls every hour
   } catch (error) {
     displayNone(weatherImages);
     displayBlock(errorMessage);
@@ -304,6 +302,9 @@ const createDailyWeather = (day,dayOfWeek,month,weather,max,min,isDay) => {
       break;
     case "wind":
       weatherImage.src = `/images/forecast-${timeOfDay}-wind.png`;
+      break;
+    case "thunder":
+      weatherImage.src = "/images/forecast-thunder.png";
       break;
     default:
       weatherImage.src = `/images/forecast-${timeOfDay}-cloud.png`;

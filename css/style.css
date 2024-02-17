@@ -15,11 +15,16 @@ table {
 .input-fields *{
     height: 60px !important;
 }
-/* button{
-    border: 1px solid rgb(122, 122, 122);
-    border-radius: 5px;
-    background-color: white;
+
+.description {
+    text-align: justify;
 }
-button:hover{
-    background-color: rgb(179, 179, 179);
-} */
+#resources::before{
+    display: none;
+}
+#recent::after{
+    display: none;
+}
+.bi-caret-down-fill, .bi-caret-left-fill{
+    font-size: 10px !important;
+}

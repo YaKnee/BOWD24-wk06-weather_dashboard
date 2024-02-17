@@ -17,44 +17,43 @@
 </head>
 <body>
     <nav class="navbar navbar-expand-lg bg-body-tertiary bg-dark border-bottom border-body sticky-top" data-bs-theme="dark">
-
         <div class="container-fluid">
             <a class="navbar-brand" href="./index.html">
-                <img src="../images/logo.png" alt="Logo" width="30" height="24" class="d-inline-block align-text-top">
+                <img src="./images/logo.png" alt="Logo" width="30" height="24" class="d-inline-block align-text-top" />
                 Weather
             </a>
-          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-          </button>
-          <div class="collapse navbar-collapse" id="navbarNavDropdown">
-            <ul class="navbar-nav">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse justify-content-between" id="navbarNavDropdown">
+                <ul class="navbar-nav">
+                    <li class="nav-item"><a class="nav-link" href="./index.html">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="./history.html">History</a></li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" id="recent" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Recent<i class="bi bi-caret-down-fill ms-1"></i></a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="./temperature.html">Temperature</a></li>
+                            <li><a class="dropdown-item" href="./humidity.html">Humidity</a></li>
+                            <li><a class="dropdown-item" href="./wind.html">Wind Speed</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item"><a class="nav-link active" aria-current="page" href="./forecast.html">Forecast App</a></li>
+                </ul>
     
-                <li class="nav-item">
-                    <a class="nav-link" href="../index.html">Home</a>
-                </li>
+                <ul class="navbar-nav">
+                    <li class="nav-item dropdown dropstart">
+                      <a class="nav-link dropdown-toggle" id="resources" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Resources <i class="bi bi-caret-left-fill d-lg-inline d-none"></i><i class="bi bi-caret-down-fill d-lg-none"></i></a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="https://flagpedia.net/" target="_blank">Flag API</a></li>
+                            <li><a class="dropdown-item" href="https://open-meteo.com/en/docs/" target="_blank">Weather API</a></li>
+                            <li><a class="dropdown-item" href="https://www.chartjs.org/" target="_blank">Chart.js</a></li>
+                        </ul>
+                    </li>
+                </ul>
     
-                <li class="nav-item">
-                  <a class="nav-link" href="../history.html">History</a>
-                </li>
-                
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle " href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                      Recent
-                    </a>
-                    <ul class="dropdown-menu">
-                      <li><a class="dropdown-item" href="../temperature.html">Temperature</a></li>
-                      <li><a class="dropdown-item" href="../humidity.html">Humidity</a></li>
-                      <li><a class="dropdown-item" href="../wind.html">Wind Speed</a></li>
-                    </ul>
-                </li>
-    
-                <li class="nav-item">
-                    <a class="nav-link active" href="#">Forecast App</a>
-                </li>
-            </ul>
-          </div>
+            </div>
         </div>
-      </nav>
+    </nav>
    
     <div class="container-fluid text-center">
 
@@ -89,23 +88,23 @@
                 <div class="not-found"><h1 class="not-found">City not found.</h1><p class="not-found">Try again with another city name.</p></div>
 
                 <div id="weather-image-container" class="d-flex align-items-center justify-content-center position-relative">
-                    <img src="/images/cloud.png" class="up-down abs img-fluid" id="cloud">
-                    <img src="/images/dcloud-1.png" class="dcloud slide abs img-fluid">
-                    <img src="/images/dcloud-2.png" class="dcloud up-down abs img-fluid">
-                    <img src="/images/lightning.png" class="up-down abs img-fluid" id="lightning">
-                    <img src="/images/mist.png" class="mist slide abs img-fluid">
-                    <img src="/images/mist2.png" class="mist up-down abs img-fluid">
-                    <img src="/images/Moon.png" class="abs img-fluid" id="moon" >
-                    <img src="/images/rain1.png" class="rain up-down abs img-fluid">
-                    <img src="/images/rain2.png" class="rain up-down abs img-fluid">
-                    <img src="/images/snow1.png" class="snow up-down abs img-fluid">
-                    <img src="/images/snow2.png" class="snow slide abs img-fluid">
-                    <img src="/images/sun.png" class="abs img-fluid" id="sun">
-                    <img src="/images/dust1.png" class="dust slide abs img-fluid">
-                    <img src="/images/dust2.png" class="dust up-down abs img-fluid">
-                    <img src="/images/cloud-windy.png" class="slide abs img-fluid" id="windy-cloud">
-                    <img src="/images/windy.png" class="slide abs img-fluid" id="windy">
-                    <img src="/images/thunder.png" class="slide abs img-fluid" id="thunder">
+                    <img src="./images/cloud.png" class="up-down abs img-fluid" id="cloud">
+                    <img src="./images/dcloud-1.png" class="dcloud slide abs img-fluid">
+                    <img src="./images/dcloud-2.png" class="dcloud up-down abs img-fluid">
+                    <img src="./images/lightning.png" class="up-down abs img-fluid" id="lightning">
+                    <img src="./images/mist.png" class="mist slide abs img-fluid">
+                    <img src="./images/mist2.png" class="mist up-down abs img-fluid">
+                    <img src="./images/Moon.png" class="abs img-fluid" id="moon" >
+                    <img src="./images/rain1.png" class="rain up-down abs img-fluid">
+                    <img src="./images/rain2.png" class="rain up-down abs img-fluid">
+                    <img src="./images/snow1.png" class="snow up-down abs img-fluid">
+                    <img src="./images/snow2.png" class="snow slide abs img-fluid">
+                    <img src="./images/sun.png" class="abs img-fluid" id="sun">
+                    <img src="./images/dust1.png" class="dust slide abs img-fluid">
+                    <img src="./images/dust2.png" class="dust up-down abs img-fluid">
+                    <img src="./images/cloud-windy.png" class="slide abs img-fluid" id="windy-cloud">
+                    <img src="./images/windy.png" class="slide abs img-fluid" id="windy">
+                    <img src="./images/thunder.png" class="slide abs img-fluid" id="thunder">
                 </div>
 
                 <p id="weather-desc" class="align-self-end text-capitalize"></p>
@@ -159,14 +158,12 @@
         <div class="shadow rounded-4 my-2 container-fluid" style="height: 500px; max-height: 50vh;">
             <canvas id="forecast-chart" style="width: 100%; height: 100%;"></canvas>
         </div>
-
-        <footer class="d-flex justify-content-evenly">
-            <a href="https://flagpedia.net/" target="_blank">Flag API</a>
-            <a href="https://open-meteo.com/en/docs/" target="_blank">Weather API</a>
-            <a href="https://www.chartjs.org/" target="_blank">Chart.js</a>
-        </footer>
     </div>
 
+    <footer class=" d-flex justify-content-evenly bg-dark border-top border-body py-2">
+        <a class="link-light link-offset-2 link-offset-3-hover link-underline link-underline-opacity-0 link-underline-opacity-75-hover" href="http://23bowd43.course.tamk.cloud/portfolio" target="_blank">&copy;Jani O'Connell 2024</a>
+      </footer>
+  
     <script
     src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
     integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"

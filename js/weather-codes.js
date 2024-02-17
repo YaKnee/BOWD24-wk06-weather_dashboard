@@ -40,7 +40,7 @@ const weatherCodes = {
     "92": { type: "rain", description: "Heavy Rain" },
     "93": { type: "snow", description: "Slight Snow" },
     "94": { type: "snow", description: "Heavy Snow" },
-    "95-99": { type: "lightning", description: "Thunderstorm" }
+    "95-99": { type: "thunder", description: "Thunderstorm" }
   }
   
   const weatherFromWMOCode = (wmoCode) => {

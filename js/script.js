@@ -86,7 +86,6 @@ const displayLocation = (data, dataType, lengthInput) => {
 
     const countryCode = document.createElement("img");
     countryCode.src = `https://flagcdn.com/${(data.results[0].country_code).toLowerCase()}.svg`;
-    //countryCode.src = `https://flagsapi.com/${data.results[0].country_code}/flat/64.png`;
     countryCode.style.width = "80px";
     countryCode.style.height = "50px";
     countryCode.alt = `${data.results[0].country} Flag`;
