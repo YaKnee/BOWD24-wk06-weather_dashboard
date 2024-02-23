@@ -1,3 +1,18 @@
+
+const scrollBar = document.getElementById("scroll-bar");
+window.addEventListener("scroll", function() {
+    //Scrolled Height
+    const scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
+    //Total Height
+    const scrollHeight = document.documentElement.scrollHeight || document.body.scrollHeight;
+    //Height of Screen
+    const clientHeight = document.documentElement.clientHeight || window.innerHeight;
+    
+    const scrolled = (scrollTop / (scrollHeight - clientHeight)) * 100;
+    scrollBar.style.width = scrolled + "%";
+});
+
+
 const getDateLimit = () => {
     const today = new Date();
     const maxDate = new Date(today);

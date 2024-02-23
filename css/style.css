@@ -16,6 +16,16 @@ table {
     height: 60px !important;
 }
 
+#scroll-bar {
+    position: fixed;
+    top: 55px;
+    left: 0;
+    width: 0;
+    height: 5px;
+    background-color: rgb(1,196,231);
+    z-index: 99;
+}
+
 .description {
     text-align: justify;
 }
