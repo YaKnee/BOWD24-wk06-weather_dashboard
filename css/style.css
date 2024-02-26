@@ -38,3 +38,13 @@ table {
 .bi-caret-down-fill, .bi-caret-left-fill{
     font-size: 10px !important;
 }
+
+.home-link:hover{
+    background-color: rgb(43,48,53) !important;
+}
+
+.table-layout{
+    table-layout: fixed;
+}
+
+footer{ margin-top: 50px;}

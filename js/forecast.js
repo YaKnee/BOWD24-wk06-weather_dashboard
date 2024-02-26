@@ -20,6 +20,7 @@ const oneDecimal = (degree) => {
 const getInputLocation = () => {
   try {
     const cityInput = document.getElementById("location-input");
+
     const fetchAndUpdate = () => {
       let initialCity = sessionStorage.getItem("currentCity");
       if (!initialCity) {
@@ -29,9 +30,8 @@ const getInputLocation = () => {
       }
       fetchGeoLocation(initialCity);
     };
-
-    const citySubmit = document.getElementById("submit-button");
-    citySubmit.addEventListener("pointerdown", function (event) {
+    const cityForm = document.getElementById("location-form");
+    cityForm.addEventListener("submit", function(event) {
       event.preventDefault();
       const city = cityInput.value;
       sessionStorage.setItem("currentCity", city);
@@ -39,6 +39,15 @@ const getInputLocation = () => {
       resetPage();
       fetchAndUpdate();
     });
+    // const citySubmit = document.getElementById("submit-button");
+    // citySubmit.addEventListener("pointerdown", function (event) {
+    //   event.preventDefault();
+    //   city = cityInput.value;
+    //   sessionStorage.setItem("currentCity", city);
+    //   cityInput.value = "";
+    //   resetPage();
+    //   fetchAndUpdate();
+    // });
     fetchAndUpdate();
   } catch (error) {
     console.log(error);
@@ -70,17 +79,18 @@ const fetchWeatherData = async (countryCode) => {
     let long = sessionStorage.getItem("longitude");
     //response = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=61.49773&longitude=23.779099&current=temperature_2m,relative_humidity_2m,apparent_temperature,precipitation,rain,showers,snowfall,weather_code,pressure_msl,wind_speed_10m,wind_direction_10m&hourly=temperature_2m,weather_code&daily=weather_code,temperature_2m_max,temperature_2m_min,sunrise,sunset&wind_speed_unit=ms&timezone=auto`);
     let response = await fetch(
-      `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${long}9&current=temperature_2m,relative_humidity_2m,apparent_temperature,is_day,weather_code,pressure_msl,wind_speed_10m,wind_direction_10m&hourly=temperature_2m&daily=weather_code,temperature_2m_max,temperature_2m_min,sunrise,sunset,precipitation_probability_max&wind_speed_unit=ms&timezone=auto`
+      `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${long}9&current=temperature_2m,relative_humidity_2m,apparent_temperature,is_day,weather_code,pressure_msl,wind_speed_10m,wind_direction_10m&hourly=temperature_2m,weather_code&daily=weather_code,temperature_2m_max,temperature_2m_min,sunrise,sunset,precipitation_probability_max&wind_speed_unit=ms&timezone=auto`
     );
     const data = await response.json();
     console.log(data);
     const isDay = data.current.is_day;
     displayNone(errorMessage);
     populateCurrentWeatherDetails(data, countryCode, isDay);
+    populateHourlyForecast(data);
     groupWeatherByDate(data, isDay);
     createChart(data, isDay);
 
-    setTimeout(fetchWeatherData, 1000 * 60 * 60); //calls every hour
+    //setTimeout(fetchWeatherData, 1000 * 60 * 60); //calls every hour
   } catch (error) {
     displayNone(weatherImages);
     displayBlock(errorMessage);
@@ -275,7 +285,7 @@ const degreesToCompass = (degrees) => {
     return compassPoints[index];
 }
 const createCurrentMiscItem = (pressure,humidity,precipitation,windSpeed,windDir,sunrise, sunset) => {
-  console.log(precipitation);
+  
     document.getElementById("h-name").innerHTML = "<strong>Humidity:</strong>";
   document.getElementById("humidity").innerText = humidity + "%";
   document.getElementById("p-name").innerHTML = "<strong>Pressure:</strong>";
@@ -290,40 +300,10 @@ const createCurrentMiscItem = (pressure,humidity,precipitation,windSpeed,windDir
   document.getElementById("sunset").innerText = sunset;
 };
 
-const createDailyWeather = (day,dayOfWeek,month,weather,max,min,isDay) => {
-  // const currentShortDay = daysOfWeek[new Date().getDay()].replace(/day|nesday|urday/, '');
-  const forecast = document.getElementById("forecast");
 
-  const weatherForecast = document.createElement("div");
-  // if(isDay === 1) {
-  //   weatherForecast.className = "forecast-container shadow highlight";
-  // } else {
-  //   weatherForecast.className = "forecast-container shadow";
-  // }
-  weatherForecast.className = "forecast-container shadow";
-  const forecastDate = document.createElement("div");
-  forecastDate.className = "forecast-date-container";
-
-  const dayName = document.createElement("p");
-  dayName.className = "day";
-  dayName.innerText = dayOfWeek;
-  forecastDate.append(dayName);
-
-  const date = document.createElement("p");
-  date.className = "date";
-  date.innerText = month + " " + day;
-  forecastDate.append(date);
-
-  weatherForecast.append(forecastDate);
-
-  const forecastWeatherContainer = document.createElement("div");
-  forecastWeatherContainer.className = "";
-  
+const setWeatherImage = (weatherType, isDay) => {
   const weatherImage = document.createElement("img");
-  weatherImage.className = "forecast-image ";
-  const weatherType = weatherFromWMOCode(weather);
   const timeOfDay = isDay === 1 ? "sun" : "moon";
-  weatherType.type = "rain";
   switch (weatherType.type) {
     case "clear":
       weatherImage.src = `./images/forecast-${timeOfDay}.png`;
@@ -367,6 +347,80 @@ const createDailyWeather = (day,dayOfWeek,month,weather,max,min,isDay) => {
     default:
       weatherImage.src = `./images/forecast-${timeOfDay}-cloud.png`;
   }
+
+  return weatherImage;
+};
+
+const populateHourlyForecast = (data) => {
+  const hourlyForecast = document.getElementById("hourly-forecast");
+  let isDay;
+  const sunrise = new Date(data.daily.sunrise[0])
+  const sunset = new Date(data.daily.sunset[0]);
+
+  for(let i = 0; i < 24; i++) {
+    const hourlyContainer = document.createElement("div");
+    hourlyContainer.className = "mx-1";
+
+    const hourlyTime = document.createElement("p");
+    hourlyTime.innerText = data.hourly.time[i].split("T")[1];
+    hourlyTime.className = "m-0";
+    hourlyContainer.append(hourlyTime);
+    let timeNow = new Date(data.hourly.time[i]);
+    if (timeNow <= sunset && timeNow >= sunrise) {
+      isDay = 1;
+    } else{
+      isDay = 0;
+    }
+    const weatherType = weatherFromWMOCode(data.hourly.weather_code[i]);
+    const weatherImage = setWeatherImage(weatherType, isDay);
+    weatherImage.style.width = "50px";
+    weatherImage.className ="my-3";
+    hourlyContainer.append(weatherImage);
+
+    const weatherDescText = document.createElement("p");
+    weatherDescText.innerText = data.hourly.temperature_2m[i] + "°C";
+    weatherDescText.className = "fs-6 m-0"
+    hourlyContainer.append(weatherDescText);
+
+    hourlyForecast.append(hourlyContainer);
+    // console.log("Temperatures: " + temps[i]);
+    // console.log("Codes: " + codes[i]);
+  }
+
+
+}
+
+const createDailyWeather = (day,dayOfWeek,month,weather,max,min,isDay) => {
+  const forecast = document.getElementById("forecast");
+
+  const weatherForecast = document.createElement("div");
+  // if(isDay === 1) {
+  //   weatherForecast.className = "forecast-container shadow highlight";
+  // } else {
+  //   weatherForecast.className = "forecast-container shadow";
+  // }
+  weatherForecast.className = "forecast-container shadow";
+  const forecastDate = document.createElement("div");
+  forecastDate.className = "forecast-date-container";
+
+  const dayName = document.createElement("p");
+  dayName.className = "day";
+  dayName.innerText = dayOfWeek;
+  forecastDate.append(dayName);
+
+  const date = document.createElement("p");
+  date.className = "date";
+  date.innerText = month + " " + day;
+  forecastDate.append(date);
+
+  weatherForecast.append(forecastDate);
+
+  const forecastWeatherContainer = document.createElement("div");
+  forecastWeatherContainer.className = "";
+
+  const weatherType = weatherFromWMOCode(weather);
+  const weatherImage = setWeatherImage(weatherType, isDay);
+  weatherImage.className = "forecast-image";
   forecastWeatherContainer.append(weatherImage);
 
 
@@ -426,16 +480,22 @@ const createChart = (data, isDay) => {
   const duplicatedMinTemps = [];
   const duplicatedMaxTemps = [];
   for (let i = 0; i < temps.length; i++) {
-    duplicatedMinTemps.push(minTemps[Math.floor(i / 24)]);
-    duplicatedMaxTemps.push(maxTemps[Math.floor(i / 24)]);
+    // if (i%12==0 || i==0 || i==167){
+      duplicatedMinTemps.push(minTemps[Math.floor(i / 24)]);
+      duplicatedMaxTemps.push(maxTemps[Math.floor(i / 24)]);
+    // } else {
+    //   duplicatedMinTemps.push(NaN);
+    //   duplicatedMaxTemps.push(NaN);
+    // }
+
   }
-  let color = {};
+  let minColor = {};
   let legendColor;
   if(isDay === 1) {
-    color = {bg: "rgb(33,166,255, 0.2)", main:"rgb(33,166,255)"};
+    minColor = {bg: "rgb(33,166,255, 0.2)", main:"rgb(33,166,255)"};
     legendColor = "white";
   } else {
-    color = {bg: "rgb(22,111,170, 0.2)", main:"rgb(22,111,170)"};
+    minColor = {bg: "rgb(22,111,170, 0.2)", main:"rgb(22,111,170)"};
     legendColor = "black";
   }
   const chartCtx = document.getElementById("forecast-chart").getContext("2d");
@@ -448,6 +508,16 @@ const createChart = (data, isDay) => {
       labels: times,
       datasets: [
         {
+          label: "Max Temperature (°C)",
+          data: duplicatedMaxTemps,
+          backgroundColor: "rgb(255,35,35,0.2)",
+          borderColor: "rgb(255,35,35)",
+          borderWidth: 2,
+          pointStyle: false,
+          // stepped: "middle",
+          // spanGaps:true,
+        },
+        {
           label: "Hourly Temperature (°C)",
           data: temps,
           backgroundColor: "rgb(255,196,0, 0.2)",
@@ -457,17 +527,14 @@ const createChart = (data, isDay) => {
         {
           label: "Min Temperature (°C)",
           data: duplicatedMinTemps,
-          backgroundColor: color.bg,
-          borderColor: color.main,
-          borderWidth: 1,
+          backgroundColor: minColor.bg,
+          borderColor: minColor.main,
+          borderWidth: 2,
+          pointStyle: false,
+          // stepped: "middle",
+          // spanGaps: true,
         },
-        {
-          label: "Max Temperature (°C)",
-          data: duplicatedMaxTemps,
-          backgroundColor: "rgb(255,35,35,0.2)",
-          borderColor: "rgb(255,35,35)",
-          borderWidth: 1,
-        },
+
       ],
     },
     options: {
@@ -478,6 +545,7 @@ const createChart = (data, isDay) => {
           beginAtZero: true,
         },
         x: {
+
           ticks: {
             display: false,
           },
@@ -489,6 +557,7 @@ const createChart = (data, isDay) => {
           position: "bottom",
           labels: {
             color: legendColor, 
+            pointStyle: "circle",
             usePointStyle: true,
           }
         },
@@ -514,5 +583,6 @@ const resetPage = () => {
     paragraph.innerHTML = "";
   });
   document.getElementById("forecast").innerHTML = "";
+  document.getElementById("hourly-forecast").innerHTML = "";
   myChart.destroy();
 };

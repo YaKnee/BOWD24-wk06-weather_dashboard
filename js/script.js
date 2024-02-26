@@ -147,7 +147,7 @@ const displayData = (data, title, reading, lineColor, bgColor) => {
 const createDataTable = (headerText) => {
     const tableElement = document.createElement("table");
     tableElement.style.width = "100%";
-    tableElement.style.textAlign = "center";
+    tableElement.classList = "text-center table-layout";
     const tableHead = document.createElement("tr");
     const headers = ["#", "Date", "Time", headerText];
     headers.forEach(header => {

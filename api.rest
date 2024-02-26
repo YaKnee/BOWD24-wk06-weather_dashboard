@@ -12,3 +12,6 @@ GET https://archive-api.open-meteo.com/v1/archive?latitude=61.4991&longitude=23.
 
 ###
 GET https://api.open-meteo.com/v1/forecast?latitude=61.4991&longitude=23.7871&current=temperature_2m,relative_humidity_2m,apparent_temperature,precipitation,is_day,rain,showers,snowfall,weather_code,pressure_msl,wind_speed_10m,wind_direction_10m&hourly=temperature_2m&daily=weather_code,temperature_2m_max,temperature_2m_min,sunrise,sunset,precipitation_probability_max&wind_speed_unit=ms&timezone=auto
+
+###
+https://archive-api.open-meteo.com/v1/archive?latitude=61.4991&longitude=23.7871&start_date=2024-02-10&end_date=2024-02-24&daily=weather_code,temperature_2m_max,temperature_2m_min,temperature_2m_mean,sunrise,sunset,sunshine_duration,precipitation_sum,precipitation_hours,wind_speed_10m_max,wind_gusts_10m_max,shortwave_radiation_sum&wind_speed_unit=ms&timezone=auto

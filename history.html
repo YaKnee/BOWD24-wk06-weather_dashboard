@@ -76,20 +76,22 @@
 
           <div class="col-md-6 input-fields">
             <select class="form-select" aria-label="Default select example" id="data-type">
-              <option value="temperature_2m" selected>Temperature</option>
-              <option value="wind_speed_10m">Wind Speed</option>
-              <option value="wind_direction_10m">Wind Direction</option>
-              <option value="relative_humidity_2m">Humidity</option>
-              <option value="rain">Rain</option>
-              <option value="snowfall">Snow</option>
-              <option value="soil_temperature_0_to_7cm">Soil Temperature</option>
+              <option value="temperature_2m_mean" selected>Average Temperature</option>
+              <option value="temperature_2m_min">Minimum Temperature</option>
+              <option value="temperature_2m_max">Maximum Temperature</option>
+              <option value="wind_speed_10m_max">Wind Speed</option>
+              <option value="wind_gusts_10m_max">Wind Gusts</option>
+              <option value="sunshine_duration">Sunshine Duration</option>
+              <option value="precipitation_sum">Percipitation Sum</option>
+              <option value="precipitation_hours">Percipitation Hours</option>
+              <option value="shortwave_radiation_sum">Shortwave Radiation Sum</option>
+             
             </select>
           </div>
         </section>
 
         <section class="row mt-3">
-          <div class="col-6 my-2">
-            <div class="row">
+          <div class="col-md-6 my-2 d-inline-flex justify-content-evenly">
               <div class="col-lg-4 my-1">
                 <label class="text-center" for="start">Start Date:</label>
                 <input class="" type="date" id="start" value="" min="1940-01-01" max="" />
@@ -103,11 +105,10 @@
               <div class="col-lg-4 my-1 align-self-end">
                 <button type="submit" value="Submit" id="submit" class="btn btn-primary btn-sm">Submit</button>
               </div>
-            </div>
           </div>
 
-            <div class="col-6 d-inline-flex justify-content-center my-2">
-              <label class="col-8 text-end pt-2" for="graph-limit">Graph Limit:</label>
+            <div class="col-md-6 d-inline-flex justify-content-center align-items-center my-2">
+              <label class="col-8 text-end" for="graph-limit">Graph Limit:</label>
               <select class="form-select" aria-label="Default select example" id="graph-limit" style="height:40px">
                 <option value="50" selected>50</option>
                 <option value="100">100</option>
@@ -122,11 +123,11 @@
 
         <section class="row mt-5">
           <div class="col-lg-12">
-            <canvas class="my-charts" style="width: 100%; height: 80vh;"><p>Your browser does not support the canvas element.</p></canvas>
+            <canvas class="my-charts" style="width: 100%; max-height: 70vh; min-height: 40vh;"><p>Your browser does not support the canvas element.</p></canvas>
           </div>
         </section>
 
-        <section class="data-table pt-0 mt-3"></section>
+        <section class="data-table pt-0 mt-3 overflow-auto" style="max-height: 100vh;"></section>
       </article>
 
       </div>
@@ -142,7 +143,8 @@
     integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
     crossorigin="anonymous"
     ></script>
-    <script async src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
     <script src="./js/history.js"></script>
     <script defer>getInputLocation("temp")</script>
 </body>

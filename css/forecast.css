@@ -101,6 +101,16 @@ body {
   font-style: italic;
   margin: 5px auto;
 }
+.hourly-forecast > *{
+  pointer-events: none;
+  user-drag: none; 
+  user-select: none;
+  -moz-user-select: none;
+  -moz-user-drag:none;
+  -webkit-user-drag: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+}
 #forecast {
   background-color: rgba(0, 0, 0, 0.3);
   z-index: 98;

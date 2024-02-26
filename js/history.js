@@ -141,15 +141,12 @@ const displayLocation = (data, dataType, startInput, endInput) => {
 
 const fetchWeatherData = async(lat, long, timezone, dataType, startInput, endInput) => {
     try {
-        const response = await fetch(`https://archive-api.open-meteo.com/v1/archive?latitude=${lat}&longitude=${long}&start_date=${startInput}&end_date=${endInput}&hourly=${dataType}&wind_speed_unit=ms&timezone=${timezone}`)
+        const response = await fetch(`https://archive-api.open-meteo.com/v1/archive?latitude=${lat}&longitude=${long}&start_date=${startInput}&end_date=${endInput}&daily=${dataType}&wind_speed_unit=ms&timezone=${timezone}`)
         const data = await response.json();
         console.log(data);
-        // /////////////////////////////////////////////////////////////////////////////////////////
-        // if (dataType === "wind_direction_10m") {
-        //     //CONVERT DEGREES TO DIRECTION
-        // }
-        displayData(data, dataType, data.hourly[dataType]);
-        createChart(data, dataType);
+        const title = weatherTitleFromReading(dataType);
+        displayData(data, title, data.daily[dataType]);
+        createChart(data, title, dataType);
     } catch (error) {
         console.error(error);
     }
@@ -166,15 +163,18 @@ const clearPage = () => {
 
 const displayData = (data, title, reading, startIndex = 0) => {
     const dataTable = document.querySelector(".data-table");
-    const table = createDataTable(title);
-    const endIndex = Math.min(startIndex + 500, data.hourly.time.length);
+    const table = createDataTable(title.title);
+    const endIndex = Math.min(startIndex + 500, data.daily.time.length);
+    if(title.title === "Sunshine Hours") {
+        reading = reading.map(seconds => (seconds/3600).toFixed(2));
+    }
     for (let i = startIndex; i < endIndex; i++) {
-        addDataRow(table, i, data.hourly.time, reading);
+        addDataRow(table, i, data.daily.time, reading);
     }
     dataTable.append(table);
 
     // Check if there's more data to load
-    if (endIndex < data.hourly.time.length) {
+    if (endIndex < data.daily.time.length) {
         // Add a button to load more data
         const loadMoreButton = document.createElement("button");
         loadMoreButton.innerText = "Load More";
@@ -182,18 +182,36 @@ const displayData = (data, title, reading, startIndex = 0) => {
         loadMoreButton.className = "btn btn-primary";
         loadMoreButton.addEventListener("click", () => {
             dataTable.removeChild(loadMoreButton);
+            
             displayData(data, title, reading, endIndex);
         });
         dataTable.append(loadMoreButton);
     }
 }
+const weatherTitleFromReading = (title) => {
+    const weatherDataMap = {
+        "temperature_2m_mean": {title: "Average Temperature (°C)", color:["rgb(255,196,0, 0.2)", "rgb(255,196,0)"] },
+        "temperature_2m_min": {title: "Minimum Temperature (°C)", color:["rgb(33,166,255, 0.2)","rgb(33,166,255)"] },
+        "temperature_2m_max": {title: "Maximum Temperature (°C)", color:["rgb(255,35,35,0.2)", "rgb(255,35,35)"] },
+        "wind_speed_10m_max": {title: "Wind Speed (m/s)", color: ["rgb(91,209,132,0.2)", "rgb(91,209,132)"]},
+        "wind_gusts_10m_max": {title: "Wind Gusts (m/s)", color:  ["rgb(91,209,132,0.2)", "rgb(91,209,132)"]},
+        "sunshine_duration": {title: "Sunshine Hours", color:["rgb(255,196,0, 0.2)", "rgb(255,196,0)"]},
+        "precipitation_sum": {title: "Precipitation Sum (mm)", color: ["rgb(127,233,255,0.2)","rgb(56,221,255)"]},
+        "precipitation_hours": {title:"Precipitation Hours", color: ["rgb(127,233,255,0.2)","rgb(56,221,255)"]},
+        "shortwave_radiation_sum": {title:"Shortwave Radiation Sum (MJ/m²)", color:["rgb(213,114,224,0.2","rgb(213,114,224"]},
+    };
 
-const createDataTable = (headerText) => {
+    return weatherDataMap[title] || { type: "unknown", description: "Unknown Weather" };
+};
+
+const createDataTable = (title) => {
     const tableElement = document.createElement("table");
     tableElement.style.width = "100%";
-    tableElement.style.textAlign = "center";
+    tableElement.className = "text-center table-layout"
     const tableHead = document.createElement("tr");
-    const headers = ["#", "Date", "Time", headerText];
+
+
+    const headers = ["#", "Date", title];
     headers.forEach(header => {
         const headerElement = document.createElement("th");
         headerElement.innerText = header;
@@ -205,30 +223,26 @@ const createDataTable = (headerText) => {
 
 const addDataRow = (table, index, time, dataSet) => {
     const tableRow = document.createElement("tr");
-    const [dateComp, timeComp] = time[index].split("T");
 
     const colOne = document.createElement("td");
     colOne.innerText = index + 1;
 
     const colTwo = document.createElement("td");
-    colTwo.innerText = rearrangeDate(dateComp);
+    colTwo.innerText = rearrangeDate(time[index]);
 
     const colThree = document.createElement("td");
-    colThree.innerText = timeComp;
-
-    const colFour = document.createElement("td");
-    colFour.innerText = dataSet[index];
+    colThree.innerText = dataSet[index];
 
     tableRow.append(colOne);
     tableRow.append(colTwo);
     tableRow.append(colThree);
-    tableRow.append(colFour);
 
     table.append(tableRow);
 }
 
+
 let myChart = null;
-const createChart = (data, dataType) => {
+const createChart = (data, title, dataType) => {
     const graphLimit = document.getElementById("graph-limit");
     let limit = graphLimit.value;
 
@@ -241,16 +255,18 @@ const createChart = (data, dataType) => {
     const updateChart = () => {
         let times, readings;
 
-        if (data.hourly.time.length > limit) {
-            const step = Math.ceil(data.hourly.time.length / limit);
-            times = data.hourly.time.filter((_, index) => index % step === 0);
-            times = times.map(time => time.replace("T", " "));
-            readings = data.hourly[dataType].filter((_, index) => index % step === 0);
+        if (data.daily.time.length > limit) {
+            const step = Math.ceil(data.daily.time.length / limit);
+            times = data.daily.time.filter((_, index) => index % step === 0);
+            readings = data.daily[dataType].filter((_, index) => index % step === 0);
         } else {
-            times = data.hourly.time.map(time => time.replace("T", " "));
-            readings = data.hourly[dataType];
+            times = data.daily.time;
+            readings = data.daily[dataType];
         }
 
+        if(dataType === "sunshine_duration") {
+            readings = readings.map(time => (time/3600).toFixed(2));
+        }
         if (myChart !== null) {
             myChart.destroy();
         }
@@ -262,8 +278,8 @@ const createChart = (data, dataType) => {
                 datasets: [{
                     //label: dataType,
                     data: readings,
-                    backgroundColor: "rgba(255, 99, 132, 0.2)",
-                    borderColor: "rgb(255, 99, 132)",
+                    backgroundColor: title.color[0],
+                    borderColor: title.color[1],
                     borderWidth: 1,
                     fill: "origin",
                 }]
@@ -273,7 +289,7 @@ const createChart = (data, dataType) => {
                 maintainAspectRatio: false,
                 scales: {
                     y: {
-                        beginAtZero: false,
+                        beginAtZero: true,
                     }
                 },
                 plugins: {
@@ -283,7 +299,7 @@ const createChart = (data, dataType) => {
                     },
                     title: {
                         display: true,
-                        text: dataType,
+                        text: title.title,
                     },
                 },
                 interaction: {
