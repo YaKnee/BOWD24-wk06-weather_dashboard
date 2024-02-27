@@ -1,4 +1,3 @@
-
 const scrollBar = document.getElementById("scroll-bar");
 window.addEventListener("scroll", function() {
     //Scrolled Height
@@ -15,76 +14,87 @@ window.addEventListener("scroll", function() {
 
 const getDateLimit = () => {
     const today = new Date();
-    const maxDate = new Date(today);
+    const maxDate = new Date();
     maxDate.setDate(today.getDate() - 5);
-    const startDate = new Date(today);
+    const startDate = new Date();
     startDate.setDate(today.getDate() - 12);
     const formattedMaxDate = maxDate.toISOString().split('T')[0];
     const formattedStartDate = startDate.toISOString().split('T')[0];
-    const start = document.getElementById("start");
-    start.max = formattedStartDate;
-    start.value = formattedStartDate;
-    const end = document.getElementById("end");
-    end.max = formattedMaxDate;
-    end.value = formattedMaxDate;
-}
-getDateLimit();
 
+    document.getElementById("start").max = formattedStartDate;
+    document.getElementById("start").value = formattedStartDate;
+
+    document.getElementById("end").max = formattedMaxDate;
+    document.getElementById("end").value = formattedMaxDate;
+    return [formattedStartDate, formattedMaxDate];
+}
+
+//handle change of data and location -> fetch location
 const getInputLocation = () => {
-    try {
-        const cityInput = document.querySelector(".city-holder");
-        const startElement = document.getElementById("start");
-        let startInput = startElement.value;
-        const endElement = document.getElementById("end");
-        let endInput = endElement.value;
-        const dataElement = document.getElementById("data-type");
-        let dataInput = dataElement.value;
-        const fetchAndUpdate = async (startInput, endInput, dataInput) => {
-            let initialCity = sessionStorage.getItem("currentCity"); 
-            if (!initialCity) {
-                initialCity = cityInput.placeholder;
-            } else {
-                cityInput.placeholder = initialCity; 
-            }
-            await fetchGeoLocation(initialCity, dataInput, startInput, endInput);
-        };
+    const [start, end] = getDateLimit();
+    const cityInput = document.querySelector(".city-holder");
+    let startInput = document.getElementById("start").value;
+    let endInput = document.getElementById("end").value;
+    const dataElement = document.getElementById("data-type");
+    let dataInput = dataElement.value;
 
-        dataElement.addEventListener("change", function(event) {
-            dataInput = event.target.value;
-            fetchAndUpdate(startInput, endInput, dataInput);
-        })
-
-        document.getElementById("submit").addEventListener("click", function(event) {
-            startInput = document.getElementById("start").value;
-            endInput = document.getElementById("end").value;
-            fetchAndUpdate(startInput, endInput, dataInput);
-        });
-        const form = document.querySelector(".city-input");
-        form.addEventListener("submit", function(event) {
-            event.preventDefault(); 
-            const city = cityInput.value;
-            sessionStorage.setItem("currentCity", city); 
-            cityInput.value = "";
-            fetchAndUpdate(startInput, endInput, dataInput);
-        });
+    const fetchAndUpdate = async (startInput, endInput, dataInput) => {
+        let initialCity = sessionStorage.getItem("currentCity") || cityInput.placeholder;
+        cityInput.placeholder = initialCity; 
+        fetchGeoLocation(initialCity, dataInput, startInput, endInput);
+    };
+    //Data-Type
+    dataElement.addEventListener("change", function(event) {
+        dataInput = event.target.value;
         fetchAndUpdate(startInput, endInput, dataInput);
-    } catch (error) {
-        console.log(error);
-    }
+    })
+    //Duration
+    document.getElementById("submit").addEventListener("click", function(event) {
+        startInput = document.getElementById("start").value;
+        endInput = document.getElementById("end").value;
+        console.log("now: " + new Date().getTime());
+        console.log("end: " + new Date(endInput).getTime());
+        if(startInput > endInput) {
+            alert("Start Date must be before End Date.")
+            document.getElementById("start").value = start;
+            document.getElementById("end").value = end;
+        } else if(new Date(endInput).getTime() > (new Date().getTime() - 5*8.64E7)) {
+            //end date > 5 days ago
+            alert("The most recent End Date available is 5 days ago.")
+            document.getElementById("end").value = end;
+        } else if(new Date(endInput).getTime() - new Date(startInput).getTime() === 0){
+            //only 1 day of data
+            alert("There must be atleast 1 day between dates for better visualization.")
+            document.getElementById("start").value = start;
+            document.getElementById("end").value = end;
+        } else {
+            fetchAndUpdate(startInput, endInput, dataInput);
+        }
+    });
+    //City
+    const form = document.querySelector(".city-input");
+    form.addEventListener("submit", function(event) {
+        event.preventDefault(); 
+        const city = cityInput.value;
+        sessionStorage.setItem("currentCity", city); 
+        cityInput.value = "";
+        fetchAndUpdate(startInput, endInput, dataInput);
+    });
+    fetchAndUpdate(startInput, endInput, dataInput);
 }
-// getInputLocation();
 
+//fetch location -> display location
 const fetchGeoLocation = async (city, dataType, startInput, endInput) => {
     try {
         const response = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${city}&count=1&language=en&format=json`);
         const data = await response.json();
         displayLocation(data, dataType, startInput, endInput);
-        //console.log(data);
     } catch (error) {
         console.log(error);
     }
 }
 
+//display location -> fetch weather
 const displayLocation = (data, dataType, startInput, endInput) => {
     clearPage();
     const location = document.querySelector(".location-details");
@@ -138,7 +148,7 @@ const displayLocation = (data, dataType, startInput, endInput) => {
     location.append(halfTwo);
     fetchWeatherData(lat, long, encodeURIComponent(timezone), dataType, startInput, endInput);
 }
-
+//fetch weather -> create table and chart
 const fetchWeatherData = async(lat, long, timezone, dataType, startInput, endInput) => {
     try {
         const response = await fetch(`https://archive-api.open-meteo.com/v1/archive?latitude=${lat}&longitude=${long}&start_date=${startInput}&end_date=${endInput}&daily=${dataType}&wind_speed_unit=ms&timezone=${timezone}`)
@@ -153,41 +163,72 @@ const fetchWeatherData = async(lat, long, timezone, dataType, startInput, endInp
 }
 
 
-const clearPage = () => {
-    document.querySelector(".location-details").innerHTML = "";
-    document.querySelector(".data-table").innerHTML = "";
-    if (myChart !== null) {
-        myChart.destroy();
-    }
-}
+//create table + add headers
+const createDataTable = (headerText) => {
+    const tableElement = document.createElement("table");
+    tableElement.style.width = "100%";
+    tableElement.className = "text-center table-layout"
+    const tableHead = document.createElement("tr");
 
+
+    const headers = ["#", "Date", headerText];
+    headers.forEach(header => {
+        const headerElement = document.createElement("th");
+        headerElement.innerText = header;
+        headerElement.className = "bg-dark text-white sticky-top"
+        headerElement.style.zIndex = "2";
+        tableHead.append(headerElement);
+    });
+    tableElement.append(tableHead);
+    return tableElement;
+}
+//add elements to table
 const displayData = (data, title, reading, startIndex = 0) => {
     const dataTable = document.querySelector(".data-table");
     const table = createDataTable(title.title);
+    //use min of length of time array or index+500
     const endIndex = Math.min(startIndex + 500, data.daily.time.length);
     if(title.title === "Sunshine Hours") {
         reading = reading.map(seconds => (seconds/3600).toFixed(2));
     }
+    //add data rows
     for (let i = startIndex; i < endIndex; i++) {
-        addDataRow(table, i, data.daily.time, reading);
+        const tableRow = document.createElement("tr");
+
+        const colOne = document.createElement("td");
+        colOne.innerText = i + 1;
+    
+        const colTwo = document.createElement("td");
+        colTwo.innerText = rearrangeDate(data.daily.time[i]);
+    
+        const colThree = document.createElement("td");
+        colThree.innerText = reading[i];
+    
+        tableRow.append(colOne);
+        tableRow.append(colTwo);
+        tableRow.append(colThree);
+    
+        table.append(tableRow);
     }
     dataTable.append(table);
 
-    // Check if there's more data to load
+    //check if more data to load
     if (endIndex < data.daily.time.length) {
-        // Add a button to load more data
+        //add button to load more
         const loadMoreButton = document.createElement("button");
         loadMoreButton.innerText = "Load More";
-        loadMoreButton.style.marginTop = "5px";
-        loadMoreButton.className = "btn btn-primary";
+        loadMoreButton.style.width = "100%";
+        loadMoreButton.className = "btn btn-primary rounded-0 mt-2";
         loadMoreButton.addEventListener("click", () => {
             dataTable.removeChild(loadMoreButton);
-            
+            //use end index as start index
             displayData(data, title, reading, endIndex);
         });
         dataTable.append(loadMoreButton);
     }
 }
+
+//weather map with title for table/chart and color for chart
 const weatherTitleFromReading = (title) => {
     const weatherDataMap = {
         "temperature_2m_mean": {title: "Average Temperature (°C)", color:["rgb(255,196,0, 0.2)", "rgb(255,196,0)"] },
@@ -195,7 +236,7 @@ const weatherTitleFromReading = (title) => {
         "temperature_2m_max": {title: "Maximum Temperature (°C)", color:["rgb(255,35,35,0.2)", "rgb(255,35,35)"] },
         "wind_speed_10m_max": {title: "Wind Speed (m/s)", color: ["rgb(91,209,132,0.2)", "rgb(91,209,132)"]},
         "wind_gusts_10m_max": {title: "Wind Gusts (m/s)", color:  ["rgb(91,209,132,0.2)", "rgb(91,209,132)"]},
-        "sunshine_duration": {title: "Sunshine Hours", color:["rgb(255,196,0, 0.2)", "rgb(255,196,0)"]},
+        "sunshine_duration": {title: "Sunshine Hours", color:["rgb(253,159,39,0.2)", "rgb(253,159,39)"]},
         "precipitation_sum": {title: "Precipitation Sum (mm)", color: ["rgb(127,233,255,0.2)","rgb(56,221,255)"]},
         "precipitation_hours": {title:"Precipitation Hours", color: ["rgb(127,233,255,0.2)","rgb(56,221,255)"]},
         "shortwave_radiation_sum": {title:"Shortwave Radiation Sum (MJ/m²)", color:["rgb(213,114,224,0.2","rgb(213,114,224"]},
@@ -203,43 +244,6 @@ const weatherTitleFromReading = (title) => {
 
     return weatherDataMap[title] || { type: "unknown", description: "Unknown Weather" };
 };
-
-const createDataTable = (title) => {
-    const tableElement = document.createElement("table");
-    tableElement.style.width = "100%";
-    tableElement.className = "text-center table-layout"
-    const tableHead = document.createElement("tr");
-
-
-    const headers = ["#", "Date", title];
-    headers.forEach(header => {
-        const headerElement = document.createElement("th");
-        headerElement.innerText = header;
-        tableHead.append(headerElement);
-    });
-    tableElement.append(tableHead);
-    return tableElement;
-}
-
-const addDataRow = (table, index, time, dataSet) => {
-    const tableRow = document.createElement("tr");
-
-    const colOne = document.createElement("td");
-    colOne.innerText = index + 1;
-
-    const colTwo = document.createElement("td");
-    colTwo.innerText = rearrangeDate(time[index]);
-
-    const colThree = document.createElement("td");
-    colThree.innerText = dataSet[index];
-
-    tableRow.append(colOne);
-    tableRow.append(colTwo);
-    tableRow.append(colThree);
-
-    table.append(tableRow);
-}
-
 
 let myChart = null;
 const createChart = (data, title, dataType) => {
@@ -331,4 +335,14 @@ const rearrangeDate = (dateString) => {
         suffix = "th";
     }
     return `${day}${suffix} ${month} ${year}`;
+}
+
+
+
+const clearPage = () => {
+    document.querySelector(".location-details").innerHTML = "";
+    document.querySelector(".data-table").innerHTML = "";
+    if (myChart !== null) {
+        myChart.destroy();
+    }
 }

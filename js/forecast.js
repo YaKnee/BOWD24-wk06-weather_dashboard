@@ -87,7 +87,7 @@ const fetchWeatherData = async (countryCode) => {
     displayNone(errorMessage);
     populateCurrentWeatherDetails(data, countryCode, isDay);
     populateHourlyForecast(data);
-    groupWeatherByDate(data, isDay);
+    populateDailyForecast(data, isDay);
     createChart(data, isDay);
 
     //setTimeout(fetchWeatherData, 1000 * 60 * 60); //calls every hour
@@ -164,62 +164,47 @@ const createCurrentLocationItem = (weather, country, isDay) => {
   const dust = document.querySelectorAll(".dust");
   displayNone(weatherImages);
   let weatherType = weatherFromWMOCode(weather);
-  // weatherType.type = "thunder-snow";
   const timeOfDay = isDay === 1 ? "sun" : "moon";
   switch (weatherType.type) {
     case "clear":
-      document.getElementById(timeOfDay).style.display = "block";
+      document.getElementById(`${timeOfDay}-clear`).style.display = "block";
       break;
     case "rain":
       document.getElementById(timeOfDay).style.display = "block";
-      cloud.style.marginTop = "100px";
       cloud.style.display = "block";
       displayBlock(rain);
-      dcloud[0].style.display = "block";
-      dcloud[0].style.marginTop = "80px";
-      rain[0].style.marginTop = "10px";
-      rain[1].style.marginTop = "10px";
       break;
     case "light-rain":
       document.getElementById(timeOfDay).style.display = "block";
-      cloud.style.marginTop = "100px";
       cloud.style.display = "block";
       rain[1].style.display = "block";
       break;
     case "freeze-rain":
       document.getElementById(timeOfDay).style.display = "block";
-      cloud.style.marginTop = "100px";
       cloud.style.display = "block";
       displayBlock(rain);
       snow[1].style.display = "block";
       break;
     case "h-freeze-rain":
       document.getElementById(timeOfDay).style.display = "block";
-      cloud.style.marginTop = "100px";
       cloud.style.display = "block";
       dcloud[0].style.display = "block";
-      dcloud[0].style.marginTop = "80px";
       displayBlock(rain);
       displayBlock(snow);
       break;
     case "light-snow":
       document.getElementById(timeOfDay).style.display = "block";
-      document.getElementById(timeOfDay).style.margin = "0 0 80px 100px";
       cloud.style.display = "block";
-      cloud.style.marginTop = "40px";
       snow[1].style.display = "block";
       break;
     case "snow":
-      document.getElementById(timeOfDay).style.display = "block";
-      document.getElementById(timeOfDay).style.margin = "0 0 80px 100px";
+      //document.getElementById(timeOfDay).style.display = "block";
       cloud.style.display = "block";
-      cloud.style.marginTop = "50px";
       dcloud[0].style.display = "block";
-      dcloud[0].style.marginTop = "70px";
       displayBlock(snow);
       break;
     case "mist":
-      document.getElementById(timeOfDay).style.display = "block";
+      document.getElementById(`${timeOfDay}-clear`).style.display = "block";
       displayBlock(mist);
       mist[0].style.zIndex = "3";
       mist[1].style.zIndex = "3";
@@ -233,37 +218,30 @@ const createCurrentLocationItem = (weather, country, isDay) => {
       lightning.style.display = "block";
       break;
     case "dust":
-      document.getElementById(timeOfDay).style.display = "block";
+      document.getElementById(`${timeOfDay}-clear`).style.display = "block";
       displayBlock(dust);
       dust[0].style.zIndex = "3";
       dust[1].style.zIndex = "3";
       break;
     case "wind":
       document.getElementById(timeOfDay).style.display = "block";
-      document.getElementById(timeOfDay).style.margin = "0 0 80px 100px";
       windyCloud.style.display = "block";
-      windyCloud.style.marginTop = "40px";
       windyCloud.style.zIndex = "3";
       wind.style.display = "block";
-      wind.style.margin = "40px 0 0 50px";
       break;
     case "thunder":
       document.getElementById(timeOfDay).style.display = "block";
-      document.getElementById(timeOfDay).style.margin = "0 0 80px 100px";
       displayBlock(dcloud);
       dcloud[0].style.zIndex = "3";
-      dcloud[1].style.marginBottom = "40px";
       dcloud[1].style.zIndex = "1";
       cloud.style.display = "block";
       thunder.style.display = "block";
       thunder.style.zIndex = "2";
       break;
     case "thunder-snow":
-      document.getElementById(timeOfDay).style.display = "block";
-      document.getElementById(timeOfDay).style.margin = "0 0 80px 100px";
+      //document.getElementById(timeOfDay).style.display = "block";
       displayBlock(dcloud);
       dcloud[0].style.zIndex = "3";
-      dcloud[1].style.marginBottom = "40px";
       dcloud[1].style.zIndex = "1";
       snow[1].style.display = "block";
       cloud.style.display = "block";
@@ -272,7 +250,6 @@ const createCurrentLocationItem = (weather, country, isDay) => {
       break;
     default:
       document.getElementById(timeOfDay).style.display = "block";
-      cloud.style.marginTop = "120px";
       cloud.style.display = "block";
   }
   document.getElementById("weather-desc").innerText = weatherType.description;
@@ -285,8 +262,7 @@ const degreesToCompass = (degrees) => {
     return compassPoints[index];
 }
 const createCurrentMiscItem = (pressure,humidity,precipitation,windSpeed,windDir,sunrise, sunset) => {
-  
-    document.getElementById("h-name").innerHTML = "<strong>Humidity:</strong>";
+  document.getElementById("h-name").innerHTML = "<strong>Humidity:</strong>";
   document.getElementById("humidity").innerText = humidity + "%";
   document.getElementById("p-name").innerHTML = "<strong>Pressure:</strong>";
   document.getElementById("pressure").innerText = pressure + "hPa";
@@ -353,18 +329,29 @@ const setWeatherImage = (weatherType, isDay) => {
 
 const populateHourlyForecast = (data) => {
   const hourlyForecast = document.getElementById("hourly-forecast");
-  let isDay;
-  const sunrise = new Date(data.daily.sunrise[0])
-  const sunset = new Date(data.daily.sunset[0]);
+
+  const hourlyForecastText = document.createElement("p");
+  hourlyForecastText.innerText = "Hourly Forecast";
+  hourlyForecastText.className = "text-white text-start m-0";
+  hourlyForecast.append(hourlyForecastText);
+
+  const hourlyForecastContainer = document.createElement("div");
+  hourlyForecastContainer.className = "d-inline-flex overflow-x-scroll justify-content-between pb-3";
+  hourlyForecastContainer.style.width = "100%";
 
   for(let i = 0; i < 24; i++) {
     const hourlyContainer = document.createElement("div");
-    hourlyContainer.className = "mx-1";
+    hourlyContainer.style.height = "100px"
+    hourlyContainer.className = "mx-1 px-2 rounded position-relative forecast-hour-container border border-light";
 
     const hourlyTime = document.createElement("p");
     hourlyTime.innerText = data.hourly.time[i].split("T")[1];
     hourlyTime.className = "m-0";
     hourlyContainer.append(hourlyTime);
+
+    let isDay;
+    const sunrise = new Date(data.daily.sunrise[0])
+    const sunset = new Date(data.daily.sunset[0]);
     let timeNow = new Date(data.hourly.time[i]);
     if (timeNow <= sunset && timeNow >= sunrise) {
       isDay = 1;
@@ -374,105 +361,98 @@ const populateHourlyForecast = (data) => {
     const weatherType = weatherFromWMOCode(data.hourly.weather_code[i]);
     const weatherImage = setWeatherImage(weatherType, isDay);
     weatherImage.style.width = "50px";
-    weatherImage.className ="my-3";
+    weatherImage.className ="position-absolute top-50 start-50 translate-middle";
     hourlyContainer.append(weatherImage);
 
     const weatherDescText = document.createElement("p");
     weatherDescText.innerText = data.hourly.temperature_2m[i] + "°C";
-    weatherDescText.className = "fs-6 m-0"
+    weatherDescText.className = "fs-6 fw-bold m-0 position-absolute bottom-0 start-50 translate-middle-x"
     hourlyContainer.append(weatherDescText);
 
-    hourlyForecast.append(hourlyContainer);
-    // console.log("Temperatures: " + temps[i]);
-    // console.log("Codes: " + codes[i]);
+    hourlyForecastContainer.append(hourlyContainer);
   }
-
-
+  hourlyForecast.append(hourlyForecastContainer);
 }
 
-const createDailyWeather = (day,dayOfWeek,month,weather,max,min,isDay) => {
+const dailyForecast = document.getElementById("daily-forecast");
+const populateDailyForecast = (data, isDay) => {
   const forecast = document.getElementById("forecast");
 
-  const weatherForecast = document.createElement("div");
-  // if(isDay === 1) {
-  //   weatherForecast.className = "forecast-container shadow highlight";
-  // } else {
-  //   weatherForecast.className = "forecast-container shadow";
-  // }
-  weatherForecast.className = "forecast-container shadow";
-  const forecastDate = document.createElement("div");
-  forecastDate.className = "forecast-date-container";
+  const dailyForecastText = document.createElement("p");
+  dailyForecastText.innerText = "Daily Forecast";
+  dailyForecastText.className = "text-white text-start m-0";
+  forecast.append(dailyForecastText);
 
-  const dayName = document.createElement("p");
-  dayName.className = "day";
-  dayName.innerText = dayOfWeek;
-  forecastDate.append(dayName);
-
-  const date = document.createElement("p");
-  date.className = "date";
-  date.innerText = month + " " + day;
-  forecastDate.append(date);
-
-  weatherForecast.append(forecastDate);
-
-  const forecastWeatherContainer = document.createElement("div");
-  forecastWeatherContainer.className = "";
-
-  const weatherType = weatherFromWMOCode(weather);
-  const weatherImage = setWeatherImage(weatherType, isDay);
-  weatherImage.className = "forecast-image";
-  forecastWeatherContainer.append(weatherImage);
-
-
-  const weatherDesc = document.createElement("div");
-  weatherDesc.className = "forecast-text-container";
-  const weatherDescText = document.createElement("p");
-  weatherDescText.innerText = weatherType.description;
-  weatherDesc.append(weatherDescText);
-  forecastWeatherContainer.append(weatherDesc);
-  weatherForecast.append(forecastWeatherContainer);
-
-
-  const highLow = document.createElement("div");
-  highLow.className = "high-low-container";
-
-  const highTemp = document.createElement("p");
-  highTemp.className = "high-temp";
-  highTemp.innerHTML =
-    '<i class="bi bi-thermometer-high" style="margin-right: 5px;"></i><strong>' +
-    oneDecimal(max) +
-    "°C</strong>";
-  highLow.append(highTemp);
-
-  const lowTemp = document.createElement("p");
-  lowTemp.className = "low-temp";
-  lowTemp.innerHTML =
-    '<i class="bi bi-thermometer" style="margin-right: 5px;"></i><strong>' +
-    oneDecimal(min) +
-    "°C</strong>";
-  highLow.append(lowTemp);
-
-  weatherForecast.append(highLow);
-  forecast.append(weatherForecast);
-};
-
-const groupWeatherByDate = (data, isDay) => {
+  const dailyForecastContainer = document.createElement("div");
+  dailyForecastContainer.className = "d-inline-flex justify-content-between pb-3 px-3";
+  dailyForecastContainer.style.width = "100%";
   for (let i = 0; i < data.daily.time.length; i++) {
-    let date = new Date(data.daily.time[i]);
-    let day = date.getDate();
-    let dayOfWeek = daysOfWeek[date.getDay()].replace(/day|nesday|urday/, "");
-    let month = months[date.getMonth()];
-    let weatherDesc = data.daily.weather_code[i];
-    let maxTemp = data.daily.temperature_2m_max[i];
-    let minTemp = data.daily.temperature_2m_min[i];
-    createDailyWeather(day,dayOfWeek,month,weatherDesc,maxTemp,minTemp,isDay);
-  }
+      const weatherForecast = document.createElement("div");
+      weatherForecast.className = "forecast-container shadow border border-light rounded";
+      const forecastDate = document.createElement("div");
+      forecastDate.className = "forecast-date-container row m-0 text-center border-bottom border-light";
+      forecastDate.style.width = "100%";
+  
+      const date = new Date(data.daily.time[i]);
+      const dayName = document.createElement("p");
+      dayName.className = "day col-lg-6 m-0 p-0 fw-bold text-uppercase";
+      dayName.innerText = daysOfWeek[date.getDay()].replace(/day|nesday|urday/, "");
+      forecastDate.append(dayName);
+  
+      const dateText = document.createElement("p");
+      dateText.innerText = months[date.getMonth()] + " " + date.getDate();
+      dateText.className = "date col-lg-6 m-0 p-0";
+      forecastDate.append(dateText);
+  
+      weatherForecast.append(forecastDate);
+  
+      const forecastWeatherContainer = document.createElement("div");
+      forecastWeatherContainer.className = "forecast-image-container position-relative";
+  
+      const weatherType = weatherFromWMOCode(data.daily.weather_code[i]);
+      const weatherImage = setWeatherImage(weatherType, isDay);
+      weatherImage.className = "forecast-image position-absolute top-0 start-50 translate-middle-x";
+      //weatherImage.style.minWidth = "50px";
+      forecastWeatherContainer.append(weatherImage);
+  
+  
+      const weatherDesc = document.createElement("div");
+      weatherDesc.className = "forecast-text-container position-absolute bottom-0 start-50 translate-middle-x";
+      weatherDesc.style.width = "100%";
+      const weatherDescText = document.createElement("p");
+      weatherDescText.innerText = weatherType.description;
+      weatherDesc.append(weatherDescText);
+      forecastWeatherContainer.append(weatherDesc);
+      weatherForecast.append(forecastWeatherContainer);
+  
+  
+      const highLow = document.createElement("div");
+      highLow.className = "high-low-container row border-top border-light pt-1 m-0";
+      highLow.style.width = "100%";
+  
+      const highTemp = document.createElement("p");
+      highTemp.className = "high-temp col-lg-6 p-0 m-0";
+      highTemp.innerHTML =
+        '<i class="bi bi-thermometer-high""></i><strong>' +
+        oneDecimal(data.daily.temperature_2m_max[i]) + "°C</strong>";
+      highLow.append(highTemp);
+  
+      const lowTemp = document.createElement("p");
+      lowTemp.className = "low-temp col-lg-6 p-0 m-0";
+      lowTemp.innerHTML =
+        '<i class="bi bi-thermometer"></i><strong>' +
+        oneDecimal(data.daily.temperature_2m_min[i]) + "°C</strong>";
+      highLow.append(lowTemp);
+  
+      weatherForecast.append(highLow);
+      dailyForecastContainer.append(weatherForecast);
+      }
+    forecast.append(dailyForecastContainer);
 };
 
 let myChart = null;
 const createChart = (data, isDay) => {
   const times = data.hourly.time.map((time) => time.replace("T", " "));
-  const dates = data.daily.time;
   const minTemps = data.daily.temperature_2m_min;
   const maxTemps = data.daily.temperature_2m_max;
   const temps = data.hourly.temperature_2m;
@@ -480,23 +460,14 @@ const createChart = (data, isDay) => {
   const duplicatedMinTemps = [];
   const duplicatedMaxTemps = [];
   for (let i = 0; i < temps.length; i++) {
-    // if (i%12==0 || i==0 || i==167){
       duplicatedMinTemps.push(minTemps[Math.floor(i / 24)]);
       duplicatedMaxTemps.push(maxTemps[Math.floor(i / 24)]);
-    // } else {
-    //   duplicatedMinTemps.push(NaN);
-    //   duplicatedMaxTemps.push(NaN);
-    // }
-
   }
   let minColor = {};
-  let legendColor;
   if(isDay === 1) {
     minColor = {bg: "rgb(33,166,255, 0.2)", main:"rgb(33,166,255)"};
-    legendColor = "white";
   } else {
-    minColor = {bg: "rgb(22,111,170, 0.2)", main:"rgb(22,111,170)"};
-    legendColor = "black";
+    minColor = {bg: "rgb(17,90,135, 0.2)", main:"rgb(17,90,135)"};
   }
   const chartCtx = document.getElementById("forecast-chart").getContext("2d");
   if (myChart !== null) {
@@ -514,8 +485,6 @@ const createChart = (data, isDay) => {
           borderColor: "rgb(255,35,35)",
           borderWidth: 2,
           pointStyle: false,
-          // stepped: "middle",
-          // spanGaps:true,
         },
         {
           label: "Hourly Temperature (°C)",
@@ -531,8 +500,6 @@ const createChart = (data, isDay) => {
           borderColor: minColor.main,
           borderWidth: 2,
           pointStyle: false,
-          // stepped: "middle",
-          // spanGaps: true,
         },
 
       ],
@@ -543,9 +510,11 @@ const createChart = (data, isDay) => {
       scales: {
         y: {
           beginAtZero: true,
+          ticks:{
+            color: "white",
+          }
         },
         x: {
-
           ticks: {
             display: false,
           },
@@ -556,15 +525,15 @@ const createChart = (data, isDay) => {
           display: true,
           position: "bottom",
           labels: {
-            color: legendColor, 
+            color: "white", 
             pointStyle: "circle",
             usePointStyle: true,
           }
         },
         title: {
-          display: true,
-          text: "Temperature (°C)",
-          color: "white",
+          display: false,
+          // text: "Temperature (°C)",
+          // color: "white",
         },
       },
       interaction: {

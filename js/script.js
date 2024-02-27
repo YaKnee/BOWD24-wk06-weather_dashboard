@@ -1,4 +1,3 @@
-
 const scrollBar = document.getElementById("scroll-bar");
 window.addEventListener("scroll", function() {
     //Scrolled Height
@@ -12,7 +11,7 @@ window.addEventListener("scroll", function() {
     scrollBar.style.width = scrolled + "%";
 });
 
-
+//handle change of data and location -> fetch location
 const getInputLocation = (dataType) => {
     try {
         const cityInput = document.querySelector(".city-holder");
@@ -46,18 +45,17 @@ const getInputLocation = (dataType) => {
         console.log(error);
     }
 }
-
+//fetch location -> display location
 const fetchGeoLocation = async (city, dataType, lengthInput) => {
     try {
         const response = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${city}&count=1&language=en&format=json`);
         const data = await response.json();
         displayLocation(data, dataType, lengthInput);
-        //console.log(data);
     } catch (error) {
         console.log(error);
     }
 }
-
+//display location -> fetch weather
 const displayLocation = (data, dataType, lengthInput) => {
     clearPage();
     const location = document.querySelector(".location-details");
@@ -114,84 +112,76 @@ const displayLocation = (data, dataType, lengthInput) => {
     fetchWeatherData(lat, long, encodeURIComponent(timezone), dataType, lengthInput);
 }
 
-
+//fetch weather -> create data table based on dataType
 const fetchWeatherData = async(lat, long, timezone, dataType, lengthInput) => {
     try {
         const response = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${long}&hourly=temperature_2m,relative_humidity_2m,wind_speed_10m&wind_speed_unit=ms&timezone=${timezone}&forecast_days=1&past_days=${lengthInput}`)
         const data = await response.json();
         console.log(data);
         if (dataType === 'temp') {
-            displayData(data, "Temperature (°C)", "temperature_2m", "rgb(255,99,132)", "rgb(255,99,132,0.2)");
+            createDataTable(data, "Temperature (°C)", "temperature_2m", "rgb(255,99,132)", "rgb(255,99,132,0.2)");
         }
         if (dataType === 'wind') {
-            displayData(data, "Wind Speed (m/s)", "wind_speed_10m", "rgb(91,209,132)", "rgb(91,209,132,0.2)");
+            createDataTable(data, "Wind Speed (m/s)", "wind_speed_10m", "rgb(91,209,132)", "rgb(91,209,132,0.2)");
         }
         if (dataType === 'humidity') {
-            displayData(data, "Humidity (%)", "relative_humidity_2m", "rgb(91,99,132)", "rgb(91,99,132,0.2)");
+            createDataTable(data, "Humidity (%)", "relative_humidity_2m", "rgb(91,99,132)", "rgb(91,99,132,0.2)");
         } 
     } catch (error) {
         console.error(error);
     }
 }
-const displayData = (data, title, reading, lineColor, bgColor) => {
+//create table table -> create chart + fetch 7 day
+const createDataTable = (data, title, reading, lineColor, bgColor) => {
     const dataTable = document.querySelector(".data-table");
-    const table = createDataTable(title);
+
+    const table = document.createElement("table");
+    table.style.width = "100%";
+    table.classList = "text-center table-layout";
+    const tableHead = document.createElement("tr");
+    const headers = ["#", "Date", "Time", title];
+    headers.forEach(header => {
+        const headerElement = document.createElement("th");
+        headerElement.innerText = header;
+        headerElement.className = "bg-dark text-white sticky-top"
+        headerElement.style.zIndex = "2";
+        tableHead.append(headerElement);
+    });
+    table.append(tableHead);
     for (let i = 0; i < data.hourly.time.length; i++) {
-        addDataRow(table, i, data.hourly.time, data.hourly[reading]);
+        const tableRow = document.createElement("tr");
+        const [dateComp, timeComp] = data.hourly.time[i].split("T");
+    
+        const colOne = document.createElement("td");
+        colOne.innerText = i + 1;
+    
+        const colTwo = document.createElement("td");
+        colTwo.innerText = rearrangeDate(dateComp);
+    
+        const colThree = document.createElement("td");
+        colThree.innerText = timeComp;
+    
+        const colFour = document.createElement("td");
+        colFour.innerText = data.hourly[reading][i];
+    
+        tableRow.append(colOne);
+        tableRow.append(colTwo);
+        tableRow.append(colThree);
+        tableRow.append(colFour);
+    
+        table.append(tableRow);
     }
     dataTable.append(table);
     createChart(title, data.hourly[reading], data.hourly.time, lineColor, bgColor);
     fetchSevenDay(data.latitude, data.longitude, reading);
 }
 
-const createDataTable = (headerText) => {
-    const tableElement = document.createElement("table");
-    tableElement.style.width = "100%";
-    tableElement.classList = "text-center table-layout";
-    const tableHead = document.createElement("tr");
-    const headers = ["#", "Date", "Time", headerText];
-    headers.forEach(header => {
-        const headerElement = document.createElement("th");
-        headerElement.innerText = header;
-        tableHead.append(headerElement);
-    });
-    tableElement.append(tableHead);
-    return tableElement;
-}
-
-const addDataRow = (table, index, time, dataSet) => {
-    const tableRow = document.createElement("tr");
-    const [dateComp, timeComp] = time[index].split("T");
-
-    const colOne = document.createElement("td");
-    colOne.innerText = index + 1;
-
-    const colTwo = document.createElement("td");
-    colTwo.innerText = rearrangeDate(dateComp);
-
-    const colThree = document.createElement("td");
-    colThree.innerText = timeComp;
-
-    const colFour = document.createElement("td");
-    colFour.innerText = dataSet[index];
-
-    tableRow.append(colOne);
-    tableRow.append(colTwo);
-    tableRow.append(colThree);
-    tableRow.append(colFour);
-
-    table.append(tableRow);
-}
 
 let myChart = null;
+//create chart
 const createChart = (label, data, dateTimes, lineColor, fillColor) => {
-    //console.log(dateTimes);
-    let { dateArray, timeArray } = createDateAndTimeArrays(dateTimes);
-    const times = dateTimes.map(time => time.replace("T", " "));
+    const timeArray = createDateAndTimeArrays(dateTimes);
     const chartCtx = document.querySelector(".my-charts").getContext("2d");
-    if(times.length > 100) {
-        timeArray = dateArray;
-    }
     myChart = new Chart(chartCtx, {
         type: "line",
         data: {
@@ -237,7 +227,7 @@ const createChart = (label, data, dateTimes, lineColor, fillColor) => {
 //-----------------------------------STATISTICS------------------------------------------------
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
-
+//fetch past 7 days (inclusive) data -> create chart
 const fetchSevenDay = async(lat, long, dataType) => {
     try {
         const response = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${long}&hourly=${dataType}&wind_speed_unit=ms&timezone=auto&past_days=6&forecast_days=1` )
@@ -250,19 +240,20 @@ const fetchSevenDay = async(lat, long, dataType) => {
 }
 
 let statChart = null;
+//create chart -> create table
 const createStatistics = (data, dataType) => {
     const array = data.hourly[dataType];
     const ctx = document.querySelector(".statistics").getContext('2d');
     const statLabels = ['Mean', 'Median', 'Mode', 'Range', 'Standard Deviation', 'Max', 'Min'];
     const statData = [mean(array), median(array), mode(array), range(array), std(array), max(array), min(array)];
     const bgColor = [
-        'rgba(255, 99, 132, 0.2)',
-        'rgba(54, 162, 235, 0.2)',
-        'rgba(255, 206, 86, 0.2)',
-        'rgba(75, 192, 192, 0.2)',
-        'rgba(153, 102, 255, 0.2)',
-        'rgba(255, 159, 64, 0.2)',
-        'rgba(0, 128, 0, 0.2)' 
+        'rgba(255, 99, 132, 0.5)',
+        'rgba(54, 162, 235, 0.5)',
+        'rgba(255, 206, 86, 0.5)',
+        'rgba(75, 192, 192, 0.5)',
+        'rgba(153, 102, 255, 0.5)',
+        'rgba(255, 159, 64, 0.5)',
+        'rgba(0, 128, 0, 0.5)' 
       ];
     const lineColor = [
         'rgb(255, 99, 132)',
@@ -307,7 +298,7 @@ const createStatistics = (data, dataType) => {
         }
       }
     });
-    createStatTable(statLabels, statData, lineColor);
+    createStatTable(statLabels, statData, bgColor);
 }
 
 const createStatTable = (statLabels, statData, bgColor) => {
@@ -335,31 +326,36 @@ const createStatTable = (statLabels, statData, bgColor) => {
 //-----------------------------------MISC------------------------------------------------------
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
-const createDateAndTimeArrays = (timestamps) => {
-    const dateArray = [];
-    const timeArray = [];
-    timestamps.forEach(dateTime => {
-        const [date, time] = dateTime.split('T');
-        dateArray.push(date);
-        timeArray.push(time);
+//time format for chart x-axis
+const createDateAndTimeArrays = (dateTimes) => {
+    if (dateTimes.length <= 24)
+        return dateTimes.map(time => time.split("T")[1]);
+    
+    return dateTimes.map(time => {
+        const suffix = getDaySuffix(parseInt(time.substring(8, 10)));
+        return time.substring(8, 10) + suffix + " " + time.substring(11, 16); 
     });
-    return { dateArray, timeArray };
 };
 
+const getDaySuffix = (day) => {
+    if (day >= 11 && day <= 13) {
+        return "ᵗʰ";
+    }
+    switch (day % 10) {
+        case 1: return "ˢᵗ";
+        case 2: return "ⁿᵈ";
+        case 3: return "ʳᵈ";
+        default: return "ᵗʰ";
+    }
+}
+
+//date format for table
 const rearrangeDate = (dateString) => {
     let [year, month, day] = dateString.split("-");
+    year = year.substring(2,4);
     month = new Date(dateString).toLocaleString("default", { month: "short" });
     day = parseInt(day);
-    let suffix = "";
-    if (day === 1 || day === 21 || day === 31) {
-        suffix = "st";
-    } else if (day === 2 || day === 22) {
-        suffix = "nd";
-    } else if (day === 3 || day === 23) {
-        suffix = "rd";
-    } else {
-        suffix = "th";
-    }
+    const suffix = getDaySuffix(day);
     return `${day}${suffix} ${month} ${year}`;
 }
 

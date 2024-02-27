@@ -91,23 +91,25 @@
                 <div class="not-found"><h1 class="not-found">City not found.</h1><p class="not-found">Try again with another city name.</p></div>
 
                 <div id="weather-image-container" class="d-flex align-items-center justify-content-center position-relative">
-                    <img src="./images/cloud.png" class="up-down abs img-fluid" id="cloud">
-                    <img src="./images/dcloud-1.png" class="dcloud slide abs img-fluid">
-                    <img src="./images/dcloud-2.png" class="dcloud up-down abs img-fluid">
-                    <img src="./images/lightning.png" class="up-down abs img-fluid" id="lightning">
-                    <img src="./images/mist.png" class="mist slide abs img-fluid">
-                    <img src="./images/mist2.png" class="mist up-down abs img-fluid">
-                    <img src="./images/Moon.png" class="abs img-fluid" id="moon" >
-                    <img src="./images/rain1.png" class="rain up-down abs img-fluid">
-                    <img src="./images/rain2.png" class="rain up-down abs img-fluid">
-                    <img src="./images/snow1.png" class="snow up-down abs img-fluid">
-                    <img src="./images/snow2.png" class="snow slide abs img-fluid">
-                    <img src="./images/sun.png" class="abs img-fluid" id="sun">
-                    <img src="./images/dust1.png" class="dust slide abs img-fluid">
-                    <img src="./images/dust2.png" class="dust up-down abs img-fluid">
-                    <img src="./images/cloud-windy.png" class="slide abs img-fluid" id="windy-cloud">
-                    <img src="./images/windy.png" class="slide abs img-fluid" id="windy">
-                    <img src="./images/thunder.png" class="slide abs img-fluid" id="thunder">
+                    <img src="./images/cloud.png" class="up-down  position-absolute top-50 start-50 translate-middle abs img-fluid" id="cloud">
+                    <img src="./images/dcloud-1.png" class="dcloud slide  position-absolute top-50 start-50 translate-middle abs img-fluid">
+                    <img src="./images/dcloud-2.png" class="dcloud up-down  position-absolute top-50 start-50 translate-middle abs img-fluid">
+                    <img src="./images/lightning.png" class="up-down  position-absolute top-50 start-50 translate-middle abs img-fluid" id="lightning">
+                    <img src="./images/mist.png" class="mist slide  position-absolute top-50 start-50 translate-middle abs img-fluid">
+                    <img src="./images/mist2.png" class="mist up-down  position-absolute top-50 start-50 translate-middle abs img-fluid">
+                    <img src="./images/moon.png" class= "position-absolute top-50 start-50 translate-middle abs img-fluid" id="moon" >
+                    <img src="./images/moon-clear.png" class= "position-absolute top-50 start-50 translate-middle abs img-fluid" id="moon-clear" >
+                    <img src="./images/rain1.png" class="rain up-down  position-absolute top-50 start-50 translate-middle abs img-fluid">
+                    <img src="./images/rain2.png" class="rain up-down  position-absolute top-50 start-50 translate-middle abs img-fluid">
+                    <img src="./images/snow1.png" class="snow up-down  position-absolute top-50 start-50 translate-middle abs img-fluid">
+                    <img src="./images/snow2.png" class="snow slide  position-absolute top-50 start-50 translate-middle abs img-fluid">
+                    <img src="./images/sun.png" class= "position-absolute top-50 start-50 translate-middle abs img-fluid" id="sun">
+                    <img src="./images/sun-clear.png" class= "position-absolute top-50 start-50 translate-middle abs img-fluid" id="sun-clear">
+                    <img src="./images/dust1.png" class="dust slide  position-absolute top-50 start-50 translate-middle abs img-fluid">
+                    <img src="./images/dust2.png" class="dust up-down  position-absolute top-50 start-50 translate-middle abs img-fluid">
+                    <img src="./images/cloud-windy.png" class="slide  position-absolute top-50 start-50 translate-middle abs img-fluid" id="windy-cloud">
+                    <img src="./images/windy.png" class="slide  position-absolute top-50 start-50 translate-middle abs img-fluid" id="windy">
+                    <img src="./images/thunder.png" class="slide  position-absolute top-50 start-50 translate-middle abs img-fluid" id="thunder">
                 </div>
 
                 <p id="weather-desc" class="align-self-end text-capitalize"></p>
@@ -152,17 +154,20 @@
             </div>
         </div>
 
-        <div id="hourly-forecast" class="d-inline-flex overflow-x-scroll text-white my-2 border border-2 rounded" style="width: 97vw; max-width: 97vw;"></div>
-        <div id="forecast" class="d-flex justify-content-evenly rounded-4 my-2"></div>
+        <div id="hourly-forecast" class="my-2 p-2 rounded-4" style="width: 100%"></div>
 
-        <div class="shadow rounded-4 my-2 container-fluid" style="height: 500px; max-height: 50vh;">
-            <canvas id="forecast-chart" style="width: 100%; height: 100%;"></canvas>
+        <div id="daily-forecast" class="overflow-x-scroll rounded-4 mb-2" style="width: 100%">
+            <div id="forecast" class="my-2 p-2 rounded-4"></div>
+            <div class="shadow rounded-4 mt-2 ps-0 container-fluid" style="height: 500px; max-height: 50vh; width: 100%">
+                <canvas id="forecast-chart" style="width: 100%; height: 100%;"></canvas>
+            </div>
         </div>
+
     </div>
 
     <footer class=" d-flex justify-content-evenly bg-dark border-top border-body py-2">
         <a class="link-light link-offset-2 link-offset-3-hover link-underline link-underline-opacity-0 link-underline-opacity-75-hover" href="http://23bowd43.course.tamk.cloud/portfolio" target="_blank">&copy; Jani O'Connell 2024</a>
-      </footer>
+    </footer>
   
     <script
     src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
