@@ -1,3 +1,15 @@
+const displayBlock = (item) => {
+    item.forEach((element) => {
+      element.style.display = "block";
+    });
+  };
+  const displayNone = (item) => {
+    item.forEach((element) => {
+      element.style.display = "none";
+    });
+  };
+
+
 const scrollBar = document.getElementById("scroll-bar");
 window.addEventListener("scroll", function() {
     //Scrolled Height
@@ -45,14 +57,20 @@ const getInputLocation = (dataType) => {
         console.log(error);
     }
 }
+
+const errorMessage = document.querySelectorAll(".not-found");
+const pageContent = document.getElementById("content");
 //fetch location -> display location
 const fetchGeoLocation = async (city, dataType, lengthInput) => {
     try {
         const response = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${city}&count=1&language=en&format=json`);
         const data = await response.json();
+        displayNone(errorMessage);
+        pageContent.style.display = "block";
         displayLocation(data, dataType, lengthInput);
     } catch (error) {
-        console.log(error);
+        displayBlock(errorMessage);
+        pageContent.style.display = "none";
     }
 }
 //display location -> fetch weather
@@ -148,6 +166,7 @@ const createDataTable = (data, title, reading, lineColor, bgColor) => {
         tableHead.append(headerElement);
     });
     table.append(tableHead);
+
     for (let i = 0; i < data.hourly.time.length; i++) {
         const tableRow = document.createElement("tr");
         const [dateComp, timeComp] = data.hourly.time[i].split("T");
@@ -363,6 +382,7 @@ const rearrangeDate = (dateString) => {
 const clearPage = () => {
     document.querySelector(".location-details").innerHTML = "";
     document.querySelector(".data-table").innerHTML = "";
+    document.querySelector(".stat-table").innerHTML = "";
     if (statChart!== null) {
         statChart.destroy();
     }

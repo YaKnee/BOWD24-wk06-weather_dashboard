@@ -63,7 +63,7 @@
 
         <section class="row location-details"></section>
 
-        <section class="row">
+        <section class="row mb-5">
 
           <div class="col input-fields">
             <form class="city-input">
@@ -86,26 +86,29 @@
 
         </section>
 
-        <section class="row mt-5">
+        <div id="not-found-container" class="not-found d-flex flex-column align-items-center "><h1 class="not-found">City not found.</h1><p class="not-found">Try again with another city name.</p></div>
+        <div id="content">
+          <section class="row">
 
-          <div class="col-lg-6">
-            <div class="border border-secondary mb-2 rounded">
-              <canvas class="my-charts" style="width: 100%; min-height: 30vh;"><p>Your browser does not support the canvas element.</p></canvas>
+            <div class="col-lg-6">
+              <div class="border border-secondary mb-2 rounded">
+                <canvas class="my-charts" style="width: 100%; min-height: 30vh;"><p>Your browser does not support the canvas element.</p></canvas>
+              </div>
+  
+  
+              <div class="border border-secondary my-2 rounded">
+                <canvas class="statistics"><p>Your browser does not support the canvas element.</p></canvas>
+                <table class="stat-table text-center"></table>
+              </div>
+  
             </div>
-
-
-            <div class="border border-secondary my-2 rounded">
-              <canvas class="statistics"><p>Your browser does not support the canvas element.</p></canvas>
-              <table class="stat-table text-center"></table>
+  
+            
+            <div class="col-lg-6">
+              <div class="data-table pt-0 mb-2"></div>
             </div>
-
-          </div>
-
-          
-          <div class="col-lg-6">
-            <div class="data-table pt-0 mb-2"></div>
-          </div>
-        </section>
+          </section>
+        </div>
 
       </article>
      </div>  

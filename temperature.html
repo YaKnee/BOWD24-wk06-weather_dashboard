@@ -57,64 +57,64 @@
 </nav>
 <div id="scroll-bar"></div>
     
-    <div class="container-md">
+<div class="container-md">
 
-      <article>
+  <article>
 
-        <section class="row location-details"></section>
+    <section class="row location-details"></section>
 
-        <section class="row">
+    <section class="row mb-5">
 
-          <div class="col input-fields">
-            <form class="city-input">
-              <div class="form-floating mb-3">
-                <input type="text" class="form-control city-holder" id="floatingInput" placeholder="Tampere">
-                <label for="floatingInput">City Name</label>
-              </div>
-            </form>
+      <div class="col input-fields">
+        <form class="city-input">
+          <div class="form-floating mb-3">
+            <input type="text" class="form-control city-holder" id="floatingInput" placeholder="Tampere">
+            <label for="floatingInput">City Name</label>
           </div>
-
-          <div class="col input-fields">
-            <select class="form-select" aria-label="Default select example" id="length-select">
-              <option value="0" selected>Today</option>
-              <option value="1">Past 2 days</option>
-              <option value="2">Past 3 days</option>
-              <option value="6">Past Week</option>
-              <option value="30">Past Month</option>
-            </select>
-          </div>
-
-        </section>
-
-        <section class="row mt-5" >
-
-          <div class="col-lg-6">
-            <div class="border border-secondary mb-2 rounded">
-              <canvas class="my-charts" style="width: 100%; min-height: 30vh;"><p>Your browser does not support the canvas element.</p></canvas>
-            </div>
-
-
-            <div class="border border-secondary my-2 rounded">
-              <canvas class="statistics"><p>Your browser does not support the canvas element.</p></canvas>
-              <table class="stat-table text-center"></table>
-            </div>
-
-          </div>
-
-          
-          <div class="col-lg-6">
-            <div class="data-table pt-0 mb-2"></div>
-          </div>
-
-        </section>
-
-      </article>
-
+        </form>
       </div>
 
-      <footer class=" d-flex justify-content-evenly bg-dark border-top border-body py-2">
-        <a class="link-light link-offset-2 link-offset-3-hover link-underline link-underline-opacity-0 link-underline-opacity-75-hover" href="http://23bowd43.course.tamk.cloud/portfolio" target="_blank">&copy;Jani O'Connell 2024</a>
-      </footer>
+      <div class="col input-fields">
+        <select class="form-select" aria-label="Default select example" id="length-select">
+          <option value="0" selected>Today</option>
+          <option value="1">Past 2 days</option>
+          <option value="2">Past 3 days</option>
+          <option value="6">Past Week</option>
+          <option value="30">Past Month</option>
+        </select>
+      </div>
+
+    </section>
+
+    <div id="not-found-container" class="not-found d-flex flex-column align-items-center "><h1 class="not-found">City not found.</h1><p class="not-found">Try again with another city name.</p></div>
+    <div id="content">
+      <section class="row">
+
+        <div class="col-lg-6">
+          <div class="border border-secondary mb-2 rounded">
+            <canvas class="my-charts" style="width: 100%; min-height: 30vh;"><p>Your browser does not support the canvas element.</p></canvas>
+          </div>
+
+
+          <div class="border border-secondary my-2 rounded">
+            <canvas class="statistics"><p>Your browser does not support the canvas element.</p></canvas>
+            <table class="stat-table text-center"></table>
+          </div>
+
+        </div>
+
+        
+        <div class="col-lg-6">
+          <div class="data-table pt-0 mb-2"></div>
+        </div>
+      </section>
+    </div>
+
+  </article>
+ </div>  
+<footer class=" d-flex justify-content-evenly bg-dark border-top border-body py-2">
+  <a class="link-light link-offset-2 link-offset-3-hover link-underline link-underline-opacity-0 link-underline-opacity-75-hover" href="http://23bowd43.course.tamk.cloud/portfolio" target="_blank">&copy;Jani O'Connell 2024</a>
+</footer>
   
 
     <script

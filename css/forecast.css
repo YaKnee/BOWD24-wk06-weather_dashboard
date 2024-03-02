@@ -21,6 +21,7 @@ body {
 }
 
 .abs{
+  position: absolute;
   pointer-events: none;
   display: none;
   user-drag: none; 
@@ -92,10 +93,10 @@ body {
 #mist, .dcloud{z-index: 1;}
 #cloud{ z-index: 2;}
 
-.slide:nth-child(even){animation: sideToSide 20s ease-in-out infinite alternate;}
-.slide:nth-child(odd){animation: sideToSide 20s ease-in-out 4s infinite alternate;}
-.up-down:nth-child(even){animation: upDown 10s ease-in-out 4s infinite alternate;}
-.up-down:nth-child(odd){animation: upDown 10s ease-in-out infinite alternate;}
+.slide:nth-child(even){animation: sideToSide 20s ease-in-out infinite alternate !important;}
+.slide:nth-child(odd){animation: sideToSide 20s ease-in-out 4s infinite alternate !important;}
+.up-down:nth-child(even){animation: upDown 10s ease-in-out 4s infinite alternate !important;}
+.up-down:nth-child(odd){animation: upDown 10s ease-in-out infinite alternate !important;}
 
 #weather-desc {
   font-style: italic;
@@ -177,7 +178,7 @@ body {
 @media (max-width: 768px) {
 
   #main,#misc {
-    background-color: transparent;
+    /* background-color: transparent; */
     margin: 0;
   }
   #location-weather {
@@ -186,7 +187,6 @@ body {
 
   #temp{font-size: 40px;  }
   #weather-image-container img{width: 300px;}
-  .forecast-text-container p {animation: scrollText 10s linear infinite;}
   .half {
     display: inline-flex;
     justify-content: space-around;
@@ -197,6 +197,7 @@ body {
 
 @media (max-width: 500px) {
   #temp{font-size: 30px;}
+  .forecast-text-container p {animation: scrollText 10s linear infinite;}
   .forecast-container * {font-size: 10px;}
   .forecast-image-container{height: 100px;}
   .high-low-container * {font-size: 9px;}
@@ -214,7 +215,6 @@ body {
   /* #forecast * {font-size: 10px;} */
   .forecast-image{width: 120px;}
   #weather-image-container img {width: 120px;}
-  /* #sun, #moon{margin: 0 0 10% 10% !important;} */
   #main p, #misc p{font-size: smaller;}
   #temp{font-size: 33px !important;}
   .forecast-temp{margin-top: 1px;}
@@ -226,13 +226,13 @@ body {
 
 @keyframes upDown {
   0%, 100%{transform: translateY(0%);}
-  50%{transform: translateY(3%);}
+  50%{transform: translateY(2%);}
 }
 
 @keyframes sideToSide {
   0%, 100%{ transform: translateX(0%);}
-  40%{transform: translateX(5%);}
-  80%{transform: translateX(-5%);}
+  40%{transform: translateX(3%);}
+  80%{transform: translateX(-3%);}
 }
 
 @keyframes scrollText {

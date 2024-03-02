@@ -163,7 +163,7 @@ const createCurrentLocationItem = (weather, country, isDay) => {
   const snow = document.querySelectorAll(".snow");
   const dust = document.querySelectorAll(".dust");
   displayNone(weatherImages);
-  let weatherType = weatherFromWMOCode(weather);
+  const weatherType = weatherFromWMOCode(weather);
   const timeOfDay = isDay === 1 ? "sun" : "moon";
   switch (weatherType.type) {
     case "clear":
@@ -182,25 +182,27 @@ const createCurrentLocationItem = (weather, country, isDay) => {
     case "freeze-rain":
       document.getElementById(timeOfDay).style.display = "block";
       cloud.style.display = "block";
-      displayBlock(rain);
-      snow[1].style.display = "block";
+      rain[1].style.display = "block";
+      snow[0].style.display = "block";
       break;
     case "h-freeze-rain":
-      document.getElementById(timeOfDay).style.display = "block";
+      // /document.getElementById(timeOfDay).style.display = "block";
       cloud.style.display = "block";
       dcloud[0].style.display = "block";
+      dcloud[0].style.zIndex = "3";
       displayBlock(rain);
       displayBlock(snow);
       break;
     case "light-snow":
       document.getElementById(timeOfDay).style.display = "block";
       cloud.style.display = "block";
-      snow[1].style.display = "block";
+      snow[0].style.display = "block";
       break;
     case "snow":
       //document.getElementById(timeOfDay).style.display = "block";
       cloud.style.display = "block";
       dcloud[0].style.display = "block";
+      dcloud[0].style.zIndex = "3";
       displayBlock(snow);
       break;
     case "mist":
@@ -239,7 +241,6 @@ const createCurrentLocationItem = (weather, country, isDay) => {
       thunder.style.zIndex = "2";
       break;
     case "thunder-snow":
-      //document.getElementById(timeOfDay).style.display = "block";
       displayBlock(dcloud);
       dcloud[0].style.zIndex = "3";
       dcloud[1].style.zIndex = "1";
@@ -339,7 +340,10 @@ const populateHourlyForecast = (data) => {
   hourlyForecastContainer.className = "d-inline-flex overflow-x-scroll justify-content-between pb-3";
   hourlyForecastContainer.style.width = "100%";
 
-  for(let i = 0; i < 24; i++) {
+  let timeIndex = data.current.time.substring(11, 13);
+  timeIndex = timeIndex[0] === "0" ? parseInt(timeIndex.substring(1)) : parseInt(timeIndex);
+
+  for(let i = timeIndex; i < 24 + timeIndex; i++) {
     const hourlyContainer = document.createElement("div");
     hourlyContainer.style.height = "100px"
     hourlyContainer.className = "mx-1 px-2 rounded position-relative forecast-hour-container border border-light";
@@ -349,15 +353,11 @@ const populateHourlyForecast = (data) => {
     hourlyTime.className = "m-0";
     hourlyContainer.append(hourlyTime);
 
-    let isDay;
-    const sunrise = new Date(data.daily.sunrise[0])
-    const sunset = new Date(data.daily.sunset[0]);
-    let timeNow = new Date(data.hourly.time[i]);
-    if (timeNow <= sunset && timeNow >= sunrise) {
-      isDay = 1;
-    } else{
-      isDay = 0;
-    }
+    const sunrise = data.daily.sunrise[0].split("T")[1];
+    const sunset = data.daily.sunset[0].split("T")[1];
+    const timeNow = data.hourly.time[i].split("T")[1];
+    const isDay = (timeNow <= sunset && timeNow >= sunrise) ? 1 : 0;
+
     const weatherType = weatherFromWMOCode(data.hourly.weather_code[i]);
     const weatherImage = setWeatherImage(weatherType, isDay);
     weatherImage.style.width = "50px";
@@ -553,5 +553,4 @@ const resetPage = () => {
   });
   document.getElementById("forecast").innerHTML = "";
   document.getElementById("hourly-forecast").innerHTML = "";
-  myChart.destroy();
 };

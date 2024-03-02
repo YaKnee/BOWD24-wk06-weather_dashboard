@@ -11,7 +11,7 @@ window.addEventListener("scroll", function() {
     scrollBar.style.width = scrolled + "%";
 });
 
-
+//make max end date 5 dayts ago as API states that is when data is most accurate
 const getDateLimit = () => {
     const today = new Date();
     const maxDate = new Date();
@@ -88,13 +88,17 @@ const fetchGeoLocation = async (city, dataType, startInput, endInput) => {
     try {
         const response = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${city}&count=1&language=en&format=json`);
         const data = await response.json();
+        document.querySelectorAll(".not-found").forEach(element => element.style.display = "none");
+        document.getElementById("content").style.display = "block";
         displayLocation(data, dataType, startInput, endInput);
     } catch (error) {
-        console.log(error);
+        //console.log(error);
+        document.querySelectorAll(".not-found").forEach(element => element.style.display = "block");
+        document.getElementById("content").style.display = "none";
     }
 }
 
-//display location -> fetch weather
+//display location details -> fetch weather
 const displayLocation = (data, dataType, startInput, endInput) => {
     clearPage();
     const location = document.querySelector(".location-details");
@@ -163,14 +167,14 @@ const fetchWeatherData = async(lat, long, timezone, dataType, startInput, endInp
 }
 
 
-//create table + add headers
+//create table
 const createDataTable = (headerText) => {
     const tableElement = document.createElement("table");
     tableElement.style.width = "100%";
     tableElement.className = "text-center table-layout"
     const tableHead = document.createElement("tr");
 
-
+    //add headers
     const headers = ["#", "Date", headerText];
     headers.forEach(header => {
         const headerElement = document.createElement("th");
@@ -230,7 +234,7 @@ const displayData = (data, title, reading, startIndex = 0) => {
 
 //weather map with title for table/chart and color for chart
 const weatherTitleFromReading = (title) => {
-    const weatherDataMap = {
+    const weatherTypeMap = {
         "temperature_2m_mean": {title: "Average Temperature (°C)", color:["rgb(255,196,0, 0.2)", "rgb(255,196,0)"] },
         "temperature_2m_min": {title: "Minimum Temperature (°C)", color:["rgb(33,166,255, 0.2)","rgb(33,166,255)"] },
         "temperature_2m_max": {title: "Maximum Temperature (°C)", color:["rgb(255,35,35,0.2)", "rgb(255,35,35)"] },
@@ -242,7 +246,7 @@ const weatherTitleFromReading = (title) => {
         "shortwave_radiation_sum": {title:"Shortwave Radiation Sum (MJ/m²)", color:["rgb(213,114,224,0.2","rgb(213,114,224"]},
     };
 
-    return weatherDataMap[title] || { type: "unknown", description: "Unknown Weather" };
+    return weatherTypeMap[title] || { type: "unknown", description: "Unknown Weather" };
 };
 
 let myChart = null;
@@ -257,17 +261,23 @@ const createChart = (data, title, dataType) => {
 
     const chartCtx = document.querySelector(".my-charts").getContext("2d");
     const updateChart = () => {
-        let times, readings;
+        let times, readings, pointStyle;
 
+        //display all data but evenly spaced if exceeding limit
         if (data.daily.time.length > limit) {
             const step = Math.ceil(data.daily.time.length / limit);
             times = data.daily.time.filter((_, index) => index % step === 0);
             readings = data.daily[dataType].filter((_, index) => index % step === 0);
+
         } else {
             times = data.daily.time;
             readings = data.daily[dataType];
-        }
 
+        }
+        //change pointer to none with larger numbers for less clutter
+        (data.daily.time.length >= 2500 &&  limit >= 1000) ? pointStyle = false : pointStyle = true;
+
+        //convert sunshine seconds to hours
         if(dataType === "sunshine_duration") {
             readings = readings.map(time => (time/3600).toFixed(2));
         }
@@ -286,6 +296,7 @@ const createChart = (data, title, dataType) => {
                     borderColor: title.color[1],
                     borderWidth: 1,
                     fill: "origin",
+                    pointStyle: pointStyle,
                 }]
             },
             options: {
@@ -319,7 +330,7 @@ const createChart = (data, title, dataType) => {
     updateChart();
 };
 
-
+//change date for data table
 const rearrangeDate = (dateString) => {
     let [year, month, day] = dateString.split("-");
     month = new Date(dateString).toLocaleString("default", { month: "short" });
