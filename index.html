@@ -141,7 +141,7 @@
           ><h3 class="my-3">Historical Data</h3></a
         >
         <p class="description col-lg-6 order-lg-1">
-          Here, users can explore historical daily weather data spanning with a
+          Here, users can explore historical daily weather data spanning a
           range from 1940 to as recent as five days ago, providing a
           comprehensive understanding of past weather conditions. This intuitive
           interface allows users to select specific types of weather data they
@@ -202,15 +202,14 @@
           minimum values for key weather metrics such as temperature, wind
           speed, and humidity. This dashboard provides insights into changes
           over specific timeframes, ensuring users are well-informed about
-          recent weather trends. The graph feature displays these metrics
-          without a gap in data points, ensuring a seamless visual
+          recent weather trends. The graph feature enables the user to have a visual
           representation of recent weather trends. Alongside the graph, users
           can access detailed numerical data in the table format, enabling
           further analysis and comparison between different time periods.
         </p>
         <img
           src="./images/stats.png"
-          class="col-lg-6 img-fluid border border-2 border-dark rounded-5 order-lg-1"
+          class="col-lg-6 img-fluid p-0 border border-2 border-dark rounded-5 order-lg-1"
           alt="Statistics Preview"
         />
       </section>
@@ -227,7 +226,7 @@
           any location they desire, depicted alongside custom-made weather
           images displayed in animation to liven up the display. Explore the
           forecast section to plan ahead with detailed predictions for the
-          upcoming days, featuring static representations of our stunning
+          upcoming days, featuring static representations of stunning
           weather images for ease of reference. Dive deeper into the forecast
           with the interactive graph, providing hour-by-hour temperature trends
           and highlighting the day's maximum and minimum temperatures with
@@ -258,9 +257,20 @@
       crossorigin="anonymous"
     ></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="./js/script.js"></script>
+    <!-- <script src="./js/script.js"></script> -->
     <script>
-      console.log("Well Howdy");
+    const scrollBar = document.getElementById("scroll-bar");
+    window.addEventListener("scroll", function() {
+    //Scrolled Height
+    const scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
+    //Total Height
+    const scrollHeight = document.documentElement.scrollHeight || document.body.scrollHeight;
+    //Height of Screen
+    const clientHeight = document.documentElement.clientHeight || window.innerHeight;
+    
+    const scrolled = (scrollTop / (scrollHeight - clientHeight)) * 100;
+    scrollBar.style.width = scrolled + "%";
+});
     </script>
   </body>
 </html>

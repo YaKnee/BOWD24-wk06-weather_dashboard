@@ -26,6 +26,7 @@ const getDateLimit = () => {
 
     document.getElementById("end").max = formattedMaxDate;
     document.getElementById("end").value = formattedMaxDate;
+    console.log("1");
     return [formattedStartDate, formattedMaxDate];
 }
 
@@ -37,7 +38,7 @@ const getInputLocation = () => {
     let endInput = document.getElementById("end").value;
     const dataElement = document.getElementById("data-type");
     let dataInput = dataElement.value;
-
+    console.log("2");
     const fetchAndUpdate = async (startInput, endInput, dataInput) => {
         let initialCity = sessionStorage.getItem("currentCity") || cityInput.placeholder;
         cityInput.placeholder = initialCity; 
@@ -88,9 +89,11 @@ const fetchGeoLocation = async (city, dataType, startInput, endInput) => {
     try {
         const response = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${city}&count=1&language=en&format=json`);
         const data = await response.json();
+        console.log("3");
         document.querySelectorAll(".not-found").forEach(element => element.style.display = "none");
         document.getElementById("content").style.display = "block";
         displayLocation(data, dataType, startInput, endInput);
+        
     } catch (error) {
         //console.log(error);
         document.querySelectorAll(".not-found").forEach(element => element.style.display = "block");
@@ -100,6 +103,7 @@ const fetchGeoLocation = async (city, dataType, startInput, endInput) => {
 
 //display location details -> fetch weather
 const displayLocation = (data, dataType, startInput, endInput) => {
+    console.log("4");
     clearPage();
     const location = document.querySelector(".location-details");
     location.style.width = "100%";
@@ -157,6 +161,7 @@ const fetchWeatherData = async(lat, long, timezone, dataType, startInput, endInp
     try {
         const response = await fetch(`https://archive-api.open-meteo.com/v1/archive?latitude=${lat}&longitude=${long}&start_date=${startInput}&end_date=${endInput}&daily=${dataType}&wind_speed_unit=ms&timezone=${timezone}`)
         const data = await response.json();
+        console.log("5");
         console.log(data);
         const title = weatherTitleFromReading(dataType);
         displayData(data, title, data.daily[dataType]);

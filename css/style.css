@@ -42,10 +42,10 @@ nav{
     text-align: justify;
 }
 #resources::before{
-    display: none;
+    display: none !important;
 }
 #recent::after{
-    display: none;
+    display: none !important;
 }
 .bi-caret-down-fill, .bi-caret-left-fill{
     font-size: 10px !important;

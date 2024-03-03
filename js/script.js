@@ -166,7 +166,7 @@ const createDataTable = (data, title, reading, lineColor, bgColor) => {
         tableHead.append(headerElement);
     });
     table.append(tableHead);
-
+    
     for (let i = 0; i < data.hourly.time.length; i++) {
         const tableRow = document.createElement("tr");
         const [dateComp, timeComp] = data.hourly.time[i].split("T");
